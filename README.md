@@ -36,6 +36,26 @@ Civitas Lab is under active development toward `v0.1.0`.
 See the [scientific scope](docs/scientific-scope.md) and
 [roadmap](docs/roadmap.md) for the planned first release.
 
+## Quick Start
+
+Civitas Lab requires Java 25. The Gradle Wrapper downloads the pinned build
+tool automatically.
+
+```bash
+./gradlew build
+java -jar app/build/libs/civitas-lab-0.1.0-SNAPSHOT.jar \
+  run configs/smoke.json \
+  --output artifacts/smoke
+java -jar app/build/libs/civitas-lab-0.1.0-SNAPSHOT.jar \
+  validate artifacts/smoke
+```
+
+Each execution writes the resolved configuration, provenance, run-level time
+series and snapshots, aggregate tables, charts, and a SHA-256 manifest.
+
+See the [experiment format](docs/experiment-format.md) for the configuration
+contract.
+
 ## License
 
 Licensed under the [Apache License 2.0](LICENSE).
