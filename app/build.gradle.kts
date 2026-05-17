@@ -25,12 +25,21 @@ dependencies {
 }
 
 tasks.shadowJar {
+    archiveBaseName = "civitas-lab"
     archiveClassifier = ""
     mergeServiceFiles()
 }
 
 tasks.jar {
+    archiveBaseName = "civitas-lab"
     archiveClassifier = "plain"
+    manifest {
+        attributes(
+            "Main-Class" to application.mainClass.get(),
+            "Implementation-Title" to "Civitas Lab",
+            "Implementation-Version" to project.version
+        )
+    }
 }
 
 tasks.build {
