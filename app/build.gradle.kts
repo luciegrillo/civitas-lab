@@ -45,3 +45,7 @@ tasks.jar {
 tasks.build {
     dependsOn(tasks.shadowJar)
 }
+
+tasks.test {
+    systemProperty("civitas.repoRoot", rootProject.projectDir.absolutePath)
+}

@@ -34,7 +34,8 @@ real societies.
 Civitas Lab is under active development toward `v0.1.0`.
 
 See the [scientific scope](docs/scientific-scope.md) and
-[roadmap](docs/roadmap.md) for the planned first release.
+[baseline results](docs/results.md) for the model boundary and current
+reproduction. The [roadmap](docs/roadmap.md) describes later work.
 
 ## Quick Start
 
