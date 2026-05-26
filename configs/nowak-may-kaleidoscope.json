@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "0.1",
+  "experimentId": "nowak-may-kaleidoscope",
+  "masterSeed": 19920359,
+  "parallelism": 1,
+  "scenarios": [
+    {
+      "id": "kaleidoscope",
+      "seedGroup": "central-defector",
+      "lattice": {
+        "width": 49,
+        "height": 49,
+        "boundary": "BOUNDED"
+      },
+      "initialization": {
+        "type": "CENTRAL_DEFECTOR"
+      },
+      "selfInteraction": true,
+      "temptationValues": [
+        1.85
+      ],
+      "replicates": 1,
+      "ticks": 179,
+      "measurementStart": 130,
+      "snapshotTicks": [
+        0,
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100,
+        179
+      ]
+    }
+  ]
+}

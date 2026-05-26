@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import org.junit.jupiter.api.Test;
 
 class SpatialGameEngineTest {
@@ -96,6 +99,29 @@ class SpatialGameEngineTest {
                 assertEquals(strategy, lattice.strategyAt(x, size - 1 - y));
             }
         }
+    }
+
+    @Test
+    void kaleidoscopeStateHasStableInternalRegressionHash()
+            throws NoSuchAlgorithmException {
+        int size = 49;
+        SpatialGameEngine engine = engine(
+                size,
+                size,
+                BoundaryCondition.BOUNDED,
+                1.85,
+                true,
+                LatticeInitializers.centralDefector(size, size));
+
+        for (int generation = 0; generation < 179; generation++) {
+            engine.step();
+        }
+
+        byte[] digest = MessageDigest.getInstance("SHA-256")
+                .digest(engine.snapshot().lattice().copyCodes());
+        assertEquals(
+                "3a58ca068761e6eca6fcd918cd08c2c4db467c5bac8f38e6d83d36b838a94df5",
+                HexFormat.of().formatHex(digest));
     }
 
     @Test
