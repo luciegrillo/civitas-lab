@@ -27,6 +27,33 @@ public final class ChartRenderer {
             List<AggregateSummary> aggregates) throws IOException {
         writeFinalDistributions(figuresDirectory, aggregates);
         writeTimeSeries(figuresDirectory, results);
+        if (results.stream().map(result -> result.plan().scenario().id()).distinct().count() > 1) {
+            writeScenarioComparison(figuresDirectory, aggregates);
+        }
+    }
+
+    private static void writeScenarioComparison(
+            Path directory, List<AggregateSummary> aggregates) throws IOException {
+        LinkedHashMap<String, List<AggregateSummary>> byScenario = new LinkedHashMap<>();
+        for (AggregateSummary aggregate : aggregates) {
+            byScenario.computeIfAbsent(
+                    aggregate.scenarioId(), ignored -> new ArrayList<>()).add(aggregate);
+        }
+        XYChart chart = chart(
+                "Final cooperation across scenarios",
+                "Temptation (b)",
+                "Median final cooperator fraction");
+        for (Map.Entry<String, List<AggregateSummary>> entry : byScenario.entrySet()) {
+            chart.addSeries(
+                    entry.getKey(),
+                    entry.getValue().stream()
+                            .map(AggregateSummary::temptation)
+                            .toList(),
+                    entry.getValue().stream()
+                            .map(AggregateSummary::finalMedian)
+                            .toList());
+        }
+        save(chart, directory.resolve("scenario-comparison.png"));
     }
 
     private static void writeFinalDistributions(
