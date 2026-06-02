@@ -35,7 +35,9 @@ Civitas Lab is under active development toward `v0.1.0`.
 
 See the [scientific scope](docs/scientific-scope.md) and
 [baseline results](docs/results.md) for the model boundary and current
-reproduction. The [roadmap](docs/roadmap.md) describes later work.
+reproduction. The [robustness study](docs/robustness.md) tests selected
+synchronous-model choices, and the [roadmap](docs/roadmap.md) describes later
+work.
 
 ## Quick Start
 

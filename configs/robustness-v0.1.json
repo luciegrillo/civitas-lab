@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "0.1",
+  "experimentId": "robustness-v0-1",
+  "masterSeed": 20260602,
+  "parallelism": 8,
+  "scenarios": [
+    {
+      "id": "baseline",
+      "seedGroup": "robustness-paired",
+      "lattice": {
+        "width": 50,
+        "height": 50,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.9
+      },
+      "selfInteraction": true,
+      "temptationValues": [1.15, 1.55, 1.85],
+      "replicates": 50,
+      "ticks": 200,
+      "measurementStart": 151,
+      "snapshotTicks": []
+    },
+    {
+      "id": "no-self-interaction",
+      "seedGroup": "robustness-paired",
+      "lattice": {
+        "width": 50,
+        "height": 50,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.9
+      },
+      "selfInteraction": false,
+      "temptationValues": [1.15, 1.55, 1.85],
+      "replicates": 50,
+      "ticks": 200,
+      "measurementStart": 151,
+      "snapshotTicks": []
+    },
+    {
+      "id": "bounded-edges",
+      "seedGroup": "robustness-paired",
+      "lattice": {
+        "width": 50,
+        "height": 50,
+        "boundary": "BOUNDED"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.9
+      },
+      "selfInteraction": true,
+      "temptationValues": [1.15, 1.55, 1.85],
+      "replicates": 50,
+      "ticks": 200,
+      "measurementStart": 151,
+      "snapshotTicks": []
+    },
+    {
+      "id": "size-20",
+      "seedGroup": "robustness-paired",
+      "lattice": {
+        "width": 20,
+        "height": 20,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.9
+      },
+      "selfInteraction": true,
+      "temptationValues": [1.15, 1.55, 1.85],
+      "replicates": 50,
+      "ticks": 200,
+      "measurementStart": 151,
+      "snapshotTicks": []
+    },
+    {
+      "id": "size-100",
+      "seedGroup": "robustness-paired",
+      "lattice": {
+        "width": 100,
+        "height": 100,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.9
+      },
+      "selfInteraction": true,
+      "temptationValues": [1.15, 1.55, 1.85],
+      "replicates": 50,
+      "ticks": 200,
+      "measurementStart": 151,
+      "snapshotTicks": []
+    },
+    {
+      "id": "density-30",
+      "seedGroup": "robustness-paired",
+      "lattice": {
+        "width": 50,
+        "height": 50,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.3
+      },
+      "selfInteraction": true,
+      "temptationValues": [1.15, 1.55, 1.85],
+      "replicates": 50,
+      "ticks": 200,
+      "measurementStart": 151,
+      "snapshotTicks": []
+    },
+    {
+      "id": "density-50",
+      "seedGroup": "robustness-paired",
+      "lattice": {
+        "width": 50,
+        "height": 50,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.5
+      },
+      "selfInteraction": true,
+      "temptationValues": [1.15, 1.55, 1.85],
+      "replicates": 50,
+      "ticks": 200,
+      "measurementStart": 151,
+      "snapshotTicks": []
+    },
+    {
+      "id": "density-70",
+      "seedGroup": "robustness-paired",
+      "lattice": {
+        "width": 50,
+        "height": 50,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.7
+      },
+      "selfInteraction": true,
+      "temptationValues": [1.15, 1.55, 1.85],
+      "replicates": 50,
+      "ticks": 200,
+      "measurementStart": 151,
+      "snapshotTicks": []
+    }
+  ]
+}
