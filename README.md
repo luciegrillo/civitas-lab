@@ -1,5 +1,8 @@
 # Civitas Lab
 
+[![CI](https://github.com/luciegrillo/civitas-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/luciegrillo/civitas-lab/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
 Agent-based social simulation laboratory built in modern Java for reproducible
 computational experiments on emergence, cooperation, polarization, trust, and
 institutional dynamics.
@@ -33,11 +36,9 @@ real societies.
 
 Civitas Lab is under active development toward `v0.1.0`.
 
-See the [scientific scope](docs/scientific-scope.md) and
-[baseline results](docs/results.md) for the model boundary and current
-reproduction. The [robustness study](docs/robustness.md) tests selected
-synchronous-model choices, and the [roadmap](docs/roadmap.md) describes later
-work.
+The current implementation includes the deterministic lattice engine, the
+reproducible experiment CLI, both historical scenarios, and the 1,200-run
+bounded robustness study.
 
 ## Quick Start
 
@@ -58,6 +59,18 @@ series and snapshots, aggregate tables, charts, and a SHA-256 manifest.
 
 See the [experiment format](docs/experiment-format.md) for the configuration
 contract.
+
+## Documentation
+
+- [Scientific scope](docs/scientific-scope.md)
+- [ODD model description](docs/model-odd.md)
+- [Experiment protocol](docs/experiment-protocol.md)
+- [Architecture](docs/architecture.md)
+- [Baseline results](docs/results.md)
+- [Robustness study](docs/robustness.md)
+- [Limitations and claim boundaries](docs/limitations.md)
+- [References](docs/references.md)
+- [Roadmap](docs/roadmap.md)
 
 ## License
 
