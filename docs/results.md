@@ -50,11 +50,11 @@ is not presented as a hash of a published historical lattice.
 ## Reproduction
 
 ```bash
-java -jar app/build/libs/civitas-lab-0.1.0-SNAPSHOT.jar \
+java -jar app/build/libs/civitas-lab-0.1.0.jar \
   run configs/nowak-may-frequency.json \
   --output artifacts/frequency
 
-java -jar app/build/libs/civitas-lab-0.1.0-SNAPSHOT.jar \
+java -jar app/build/libs/civitas-lab-0.1.0.jar \
   run configs/nowak-may-kaleidoscope.json \
   --output artifacts/kaleidoscope
 ```
