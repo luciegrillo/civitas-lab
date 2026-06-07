@@ -34,7 +34,9 @@ real societies.
 
 ## Status
 
-Civitas Lab is under active development toward `v0.1.0`.
+Civitas Lab `v0.1.0` is the first published, reproducible spatial-cooperation
+baseline. Download the executable and complete experiment outputs from the
+[v0.1.0 release](https://github.com/luciegrillo/civitas-lab/releases/tag/v0.1.0).
 
 The current implementation includes the deterministic lattice engine, the
 reproducible experiment CLI, both historical scenarios, and the 1,200-run
@@ -47,10 +49,10 @@ tool automatically.
 
 ```bash
 ./gradlew build
-java -jar app/build/libs/civitas-lab-0.1.0-SNAPSHOT.jar \
+java -jar app/build/libs/civitas-lab-0.1.0.jar \
   run configs/smoke.json \
   --output artifacts/smoke
-java -jar app/build/libs/civitas-lab-0.1.0-SNAPSHOT.jar \
+java -jar app/build/libs/civitas-lab-0.1.0.jar \
   validate artifacts/smoke
 ```
 
