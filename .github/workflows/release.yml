@@ -1,0 +1,135 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build and test
+        run: ./gradlew clean build --no-daemon
+
+      - name: Verify release identity
+        shell: bash
+        run: |
+          mapfile -t jars < <(
+            find app/build/libs -maxdepth 1 -type f \
+              -name "civitas-lab-*.jar" ! -name "*-plain.jar" | sort
+          )
+          if (( ${#jars[@]} != 1 )); then
+            printf 'Expected one executable JAR, found %d\n' "${#jars[@]}" >&2
+            exit 1
+          fi
+
+          jar_path="${jars[0]}"
+          version="$(java -jar "$jar_path" version)"
+          version="${version#Civitas Lab }"
+          if [[ -z "$version" ]]; then
+            echo "Could not resolve the application version" >&2
+            exit 1
+          fi
+
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            expected="${GITHUB_REF_NAME#v}"
+            if [[ "$GITHUB_REF_NAME" != v* || "$version" != "$expected" ]]; then
+              printf 'Tag %s does not match application version %s\n' \
+                "$GITHUB_REF_NAME" "$version" >&2
+              exit 1
+            fi
+          fi
+
+          echo "CIVITAS_JAR=$jar_path" >> "$GITHUB_ENV"
+          echo "CIVITAS_VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Run frequency experiment
+        run: |
+          java -jar "$CIVITAS_JAR" run \
+            configs/nowak-may-frequency.json \
+            --output artifacts/frequency
+          java -jar "$CIVITAS_JAR" validate artifacts/frequency
+
+      - name: Run kaleidoscope experiment
+        run: |
+          java -jar "$CIVITAS_JAR" run \
+            configs/nowak-may-kaleidoscope.json \
+            --output artifacts/kaleidoscope
+          java -jar "$CIVITAS_JAR" validate artifacts/kaleidoscope
+
+      - name: Run robustness experiment
+        run: |
+          java -jar "$CIVITAS_JAR" run \
+            configs/robustness-v0.1.json \
+            --output artifacts/robustness
+          java -jar "$CIVITAS_JAR" validate artifacts/robustness
+
+      - name: Package release artifacts
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp "$CIVITAS_JAR" "dist/civitas-lab-${CIVITAS_VERSION}.jar"
+          tar --sort=name --mtime="@0" --owner=0 --group=0 --numeric-owner \
+            -cf - -C artifacts frequency kaleidoscope robustness \
+            | gzip -n > "dist/civitas-lab-${CIVITAS_VERSION}-results.tar.gz"
+          (
+            cd dist
+            sha256sum \
+              "civitas-lab-${CIVITAS_VERSION}.jar" \
+              "civitas-lab-${CIVITAS_VERSION}-results.tar.gz" \
+              > SHA256SUMS
+          )
+          cat dist/SHA256SUMS
+
+      - name: Upload release candidate
+        uses: actions/upload-artifact@v7
+        with:
+          name: civitas-lab-${{ env.CIVITAS_VERSION }}
+          path: dist/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          notes="docs/releases/${CIVITAS_VERSION}.md"
+          test -f "$notes"
+          gh release create "$GITHUB_REF_NAME" \
+            "dist/civitas-lab-${CIVITAS_VERSION}.jar#Executable JAR (Java 25)" \
+            "dist/civitas-lab-${CIVITAS_VERSION}-results.tar.gz#Complete experiment outputs" \
+            "dist/SHA256SUMS#SHA-256 checksums" \
+            --verify-tag \
+            --latest \
+            --title "Civitas Lab ${GITHUB_REF_NAME}" \
+            --notes-file "$notes"
