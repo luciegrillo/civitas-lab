@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use Civitas Lab, please cite the software release."
+title: "Civitas Lab"
+type: software
+authors:
+  - family-names: "Grillo"
+    given-names: "Lucie"
+repository-code: "https://github.com/luciegrillo/civitas-lab"
+url: "https://github.com/luciegrillo/civitas-lab"
+license: "Apache-2.0"
+version: "0.1.0"
+date-released: "2026-06-07"
+keywords:
+  - agent-based modeling
+  - computational social science
+  - evolutionary game theory
+  - reproducible simulation
