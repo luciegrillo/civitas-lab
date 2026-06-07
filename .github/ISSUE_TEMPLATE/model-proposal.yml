@@ -1,0 +1,41 @@
+name: Model proposal
+description: Propose a scientifically grounded model or experiment.
+title: "model: "
+labels:
+  - "area: science"
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Research question
+      description: State the narrow question the model or experiment addresses.
+    validations:
+      required: true
+  - type: textarea
+    id: mechanism
+    attributes:
+      label: Mechanism
+      description: Describe entities, state, interactions, scheduling, and outputs.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Link primary literature supporting the mechanism or target pattern.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Verification and validation
+      description: Explain analytical checks, reference patterns, and claim boundaries.
+    validations:
+      required: true
+  - type: textarea
+    id: reproducibility
+    attributes:
+      label: Reproducibility impact
+      description: Identify configuration, seed, artifact, or compatibility implications.
+    validations:
+      required: true
