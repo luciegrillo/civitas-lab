@@ -123,8 +123,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          notes="docs/releases/${CIVITAS_VERSION}.md"
-          test -f "$notes"
+          notes="docs/releases/v${CIVITAS_VERSION}.md"
+          if [[ ! -f "$notes" ]]; then
+            echo "Missing release notes: $notes" >&2
+            exit 1
+          fi
           gh release create "$GITHUB_REF_NAME" \
             "dist/civitas-lab-${CIVITAS_VERSION}.jar#Executable JAR (Java 25)" \
             "dist/civitas-lab-${CIVITAS_VERSION}-results.tar.gz#Complete experiment outputs" \
