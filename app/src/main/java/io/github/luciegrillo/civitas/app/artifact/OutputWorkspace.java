@@ -2,6 +2,7 @@ package io.github.luciegrillo.civitas.app.artifact;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Objects;
@@ -26,7 +27,8 @@ public final class OutputWorkspace {
         if (root.getParent() == null || root.equals(workingDirectory)) {
             throw new IOException("refusing to use filesystem root or working directory as output");
         }
-        if (Files.exists(root)) {
+        rejectSymbolicLinkComponents(root);
+        if (Files.exists(root, LinkOption.NOFOLLOW_LINKS)) {
             if (!overwrite) {
                 throw new IOException(
                         "output directory already exists; use --overwrite to replace it: " + root);
@@ -50,5 +52,16 @@ public final class OutputWorkspace {
         Path directory = root.resolve("runs").resolve(runId);
         Files.createDirectories(directory.resolve("snapshots"));
         return directory;
+    }
+
+    private static void rejectSymbolicLinkComponents(Path root) throws IOException {
+        Path current = root.getRoot();
+        for (Path name : root) {
+            current = current == null ? name : current.resolve(name);
+            if (Files.exists(current, LinkOption.NOFOLLOW_LINKS)
+                    && Files.isSymbolicLink(current)) {
+                throw new IOException("refusing symlinked output path: " + current);
+            }
+        }
     }
 }
