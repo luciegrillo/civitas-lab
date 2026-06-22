@@ -3,7 +3,7 @@ package io.github.luciegrillo.civitas.core;
 import java.util.Objects;
 
 /**
- * Deterministic synchronous engine for a spatial weak Prisoner's Dilemma.
+ * Deterministic synchronous engine for a binary spatial game.
  *
  * <p>Each step has two complete phases. First, payoffs are computed from the
  * current lattice. Second, strategies are written to a separate buffer. No
@@ -77,7 +77,7 @@ public final class SpatialGameEngine {
                 }
             }
 
-            byte selected = selectStrategy(
+            byte selected = config.updateRule().select(
                     focal, bestCooperatorPayoff, bestDefectorPayoff);
             next[site] = selected;
             if (selected == Strategy.COOPERATE.code()) {
@@ -120,31 +120,31 @@ public final class SpatialGameEngine {
     private void computePayoffs() {
         for (int site = 0; site < current.length; site++) {
             int cooperativeOpponents = 0;
+            int defectingOpponents = 0;
             int neighborCount = neighborhoods.count(site);
             for (int offset = 0; offset < neighborCount; offset++) {
                 int opponent = neighborhoods.neighbor(site, offset);
                 if (current[opponent] == Strategy.COOPERATE.code()) {
                     cooperativeOpponents++;
+                } else {
+                    defectingOpponents++;
                 }
             }
-            if (config.selfInteraction()
-                    && current[site] == Strategy.COOPERATE.code()) {
-                cooperativeOpponents++;
+            if (config.selfInteraction()) {
+                if (current[site] == Strategy.COOPERATE.code()) {
+                    cooperativeOpponents++;
+                } else {
+                    defectingOpponents++;
+                }
             }
             payoffs[site] = config.game().accumulatedPayoff(
-                    current[site], cooperativeOpponents);
+                    current[site], cooperativeOpponents, defectingOpponents);
         }
     }
 
     static byte selectStrategy(
             byte focal, double bestCooperatorPayoff, double bestDefectorPayoff) {
-        int comparison = Double.compare(bestCooperatorPayoff, bestDefectorPayoff);
-        if (comparison > 0) {
-            return Strategy.COOPERATE.code();
-        }
-        if (comparison < 0) {
-            return Strategy.DEFECT.code();
-        }
-        return focal;
+        return UnconditionalImitation.INSTANCE.select(
+                focal, bestCooperatorPayoff, bestDefectorPayoff);
     }
 }

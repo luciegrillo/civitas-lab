@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Binary payoff and local update-rule extension points inside the spatial
+  engine while preserving the v0.1 weak Prisoner's Dilemma experiment schema.
+
 ## [0.1.0] - 2026-06-07
 
 ### Added

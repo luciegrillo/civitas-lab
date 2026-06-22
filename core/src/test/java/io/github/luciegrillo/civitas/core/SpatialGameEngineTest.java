@@ -61,6 +61,28 @@ class SpatialGameEngineTest {
     }
 
     @Test
+    void supportsCustomBinaryPayoffModels() {
+        BinaryMatrixGame coordinationGame = new BinaryMatrixGame(
+                "self-defect-test",
+                1.0,
+                0.0,
+                0.0,
+                10.0);
+        SimulationConfig config = new SimulationConfig(
+                5,
+                5,
+                BoundaryCondition.TOROIDAL,
+                coordinationGame,
+                true);
+        SpatialGameEngine engine = new SpatialGameEngine(
+                config, LatticeInitializers.centralDefector(5, 5));
+
+        engine.step();
+
+        assertEquals(9, engine.metrics().defectors());
+    }
+
+    @Test
     void repeatedRunsAreBitIdentical() {
         Lattice initial = LatticeInitializers.bernoulliCooperators(20, 20, 0.9, 99);
         SpatialGameEngine first = engine(

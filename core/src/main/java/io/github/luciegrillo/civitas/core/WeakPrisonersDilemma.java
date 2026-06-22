@@ -8,7 +8,7 @@ package io.github.luciegrillo.civitas.core;
  *
  * @param temptation temptation to defect ({@code b})
  */
-public record WeakPrisonersDilemma(double temptation) {
+public record WeakPrisonersDilemma(double temptation) implements BinaryPayoff {
 
     /**
      * Creates a weak Prisoner's Dilemma.
@@ -17,6 +17,11 @@ public record WeakPrisonersDilemma(double temptation) {
         if (!Double.isFinite(temptation) || temptation <= 1.0 || temptation > 2.0) {
             throw new IllegalArgumentException("temptation must be finite and in (1, 2]");
         }
+    }
+
+    @Override
+    public String name() {
+        return "weak-prisoners-dilemma";
     }
 
     /**
@@ -34,8 +39,21 @@ public record WeakPrisonersDilemma(double temptation) {
     }
 
     double accumulatedPayoff(byte focal, int cooperativeOpponents) {
+        if (cooperativeOpponents < 0) {
+            throw new IllegalArgumentException("cooperativeOpponents must not be negative");
+        }
+        Strategy.fromCode(focal);
         return focal == Strategy.COOPERATE.code()
                 ? cooperativeOpponents
                 : cooperativeOpponents * temptation;
+    }
+
+    @Override
+    public double accumulatedPayoff(
+            byte focal, int cooperativeOpponents, int defectingOpponents) {
+        if (cooperativeOpponents < 0 || defectingOpponents < 0) {
+            throw new IllegalArgumentException("opponent counts must not be negative");
+        }
+        return accumulatedPayoff(focal, cooperativeOpponents);
     }
 }
