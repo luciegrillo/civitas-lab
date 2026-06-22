@@ -7,11 +7,18 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-22
+
 ### Added
 
 - Binary payoff and local update-rule extension points inside the spatial
   engine while preserving the v0.1 weak Prisoner's Dilemma experiment schema.
 - Across-replicate standard deviations in aggregate experiment outputs.
+
+### Security
+
+- Artifact validation and output preparation now reject symlinked artifact,
+  manifest, and output paths without following links.
 
 ## [0.1.0] - 2026-06-07
 
@@ -35,5 +42,6 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   limitations, references, and citation metadata.
 - CI and release automation for complete, validated experiment artifacts.
 
-[Unreleased]: https://github.com/luciegrillo/civitas-lab/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/luciegrillo/civitas-lab/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/luciegrillo/civitas-lab/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/luciegrillo/civitas-lab/releases/tag/v0.1.0
