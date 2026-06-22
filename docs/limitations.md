@@ -41,10 +41,11 @@ The robustness grid samples selected values rather than continuously exploring
 the parameter space. Fifty replicates may still be inadequate near sharp phase
 transitions or rare absorbing outcomes.
 
-The reported summaries are descriptive. No correction for multiple
-comparisons, formal hypothesis test, or model calibration is performed.
-Multimodal outcomes require inspecting quantiles and state frequencies, not
-only means.
+The reported summaries are descriptive. Across-replicate standard deviations
+describe observed dispersion, but they are not confidence intervals, stopping
+rules, or formal uncertainty claims. No correction for multiple comparisons,
+formal hypothesis test, or model calibration is performed. Multimodal outcomes
+require inspecting quantiles and state frequencies, not only means.
 
 ## Validation Limitations
 

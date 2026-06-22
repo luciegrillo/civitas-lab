@@ -47,6 +47,9 @@ output/
         └── snapshots/
 ```
 
+`aggregate.csv` reports means, across-replicate standard deviations, quantiles,
+and final-state rates for each scenario and temptation value.
+
 `provenance.json` contains volatile runtime metadata and is intentionally
 excluded from `checksums.sha256`. All scientific artifacts are hashed.
 

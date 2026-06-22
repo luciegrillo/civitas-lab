@@ -54,15 +54,17 @@ public final class CsvArtifacts {
     public static void writeAggregates(
             Path path, List<AggregateSummary> aggregates) throws IOException {
         StringBuilder csv = new StringBuilder(
-                "scenario_id,temptation,runs,final_mean,final_q05,final_q25,"
+                "scenario_id,temptation,runs,final_mean,final_sd,final_q05,final_q25,"
                         + "final_median,final_q75,final_q95,all_cooperate_rate,"
                         + "all_defect_rate,mixed_rate,measurement_mean_cooperator_fraction,"
-                        + "measurement_mean_flip_rate\n");
+                        + "measurement_cooperator_fraction_sd,measurement_mean_flip_rate,"
+                        + "measurement_flip_rate_sd\n");
         for (AggregateSummary aggregate : aggregates) {
             csv.append(aggregate.scenarioId()).append(',')
                     .append(format(aggregate.temptation())).append(',')
                     .append(aggregate.runs()).append(',')
                     .append(format(aggregate.finalMean())).append(',')
+                    .append(format(aggregate.finalStandardDeviation())).append(',')
                     .append(format(aggregate.finalQ05())).append(',')
                     .append(format(aggregate.finalQ25())).append(',')
                     .append(format(aggregate.finalMedian())).append(',')
@@ -72,7 +74,11 @@ public final class CsvArtifacts {
                     .append(format(aggregate.allDefectRate())).append(',')
                     .append(format(aggregate.mixedRate())).append(',')
                     .append(format(aggregate.measurementMeanCooperatorFraction())).append(',')
-                    .append(format(aggregate.measurementMeanFlipRate())).append('\n');
+                    .append(format(aggregate.measurementCooperatorFractionStandardDeviation()))
+                    .append(',')
+                    .append(format(aggregate.measurementMeanFlipRate())).append(',')
+                    .append(format(aggregate.measurementFlipRateStandardDeviation()))
+                    .append('\n');
         }
         Files.writeString(path, csv, StandardCharsets.UTF_8);
     }

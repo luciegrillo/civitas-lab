@@ -120,5 +120,7 @@ been recovered.
 
 For each scenario and temptation, Civitas Lab reports final means, medians,
 5th/25th/75th/95th percentiles, measurement-window means, and final population
-state rates. Means are never treated as sufficient when distributions are
+state rates. Aggregate tables also include across-replicate standard deviations
+for final cooperation, measurement-window cooperation, and measurement-window
+flip rates. Means are never treated as sufficient when distributions are
 multimodal or contain absorbing states.
