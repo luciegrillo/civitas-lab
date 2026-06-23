@@ -8,8 +8,8 @@ authors:
 repository-code: "https://github.com/luciegrillo/civitas-lab"
 url: "https://github.com/luciegrillo/civitas-lab"
 license: "Apache-2.0"
-version: "0.1.0"
-date-released: "2026-06-07"
+version: "0.1.1"
+date-released: "2026-06-22"
 keywords:
   - agent-based modeling
   - computational social science

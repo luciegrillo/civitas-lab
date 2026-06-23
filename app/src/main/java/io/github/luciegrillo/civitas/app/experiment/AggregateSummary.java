@@ -8,6 +8,7 @@ public record AggregateSummary(
         double temptation,
         int runs,
         double finalMean,
+        double finalStandardDeviation,
         double finalQ05,
         double finalQ25,
         double finalMedian,
@@ -17,5 +18,7 @@ public record AggregateSummary(
         double allDefectRate,
         double mixedRate,
         double measurementMeanCooperatorFraction,
-        double measurementMeanFlipRate) {
+        double measurementCooperatorFractionStandardDeviation,
+        double measurementMeanFlipRate,
+        double measurementFlipRateStandardDeviation) {
 }

@@ -19,8 +19,20 @@ class StatisticsTest {
     }
 
     @Test
+    void computesSampleStandardDeviation() {
+        assertEquals(0.0, Statistics.sampleStandardDeviation(List.of(2.0)));
+        assertEquals(
+                Math.sqrt(5.0 / 3.0),
+                Statistics.sampleStandardDeviation(List.of(1.0, 2.0, 3.0, 4.0)),
+                1.0e-12);
+    }
+
+    @Test
     void rejectsEmptySamples() {
         assertThrows(IllegalArgumentException.class, () -> Statistics.mean(List.of()));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> Statistics.sampleStandardDeviation(List.of()));
         assertThrows(IllegalArgumentException.class, () -> Statistics.quantile(List.of(), 0.5));
     }
 }

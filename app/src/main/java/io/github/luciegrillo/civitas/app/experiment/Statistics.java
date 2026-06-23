@@ -25,6 +25,26 @@ public final class Statistics {
     }
 
     /**
+     * Sample standard deviation. A single observed value has zero observed
+     * dispersion.
+     */
+    public static double sampleStandardDeviation(List<Double> values) {
+        if (values.isEmpty()) {
+            throw new IllegalArgumentException("values must not be empty");
+        }
+        if (values.size() == 1) {
+            return 0.0;
+        }
+        double mean = mean(values);
+        double squaredDifferenceSum = 0.0;
+        for (double value : values) {
+            double difference = value - mean;
+            squaredDifferenceSum += difference * difference;
+        }
+        return Math.sqrt(squaredDifferenceSum / (values.size() - 1));
+    }
+
+    /**
      * Linear-interpolation quantile using index {@code q * (n - 1)}.
      */
     public static double quantile(List<Double> values, double q) {

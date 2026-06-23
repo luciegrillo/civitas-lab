@@ -53,6 +53,7 @@ public final class ResultAggregator {
                     entry.getKey().temptation,
                     count,
                     Statistics.mean(finalFractions),
+                    Statistics.sampleStandardDeviation(finalFractions),
                     Statistics.quantile(finalFractions, 0.05),
                     Statistics.quantile(finalFractions, 0.25),
                     Statistics.quantile(finalFractions, 0.50),
@@ -62,7 +63,9 @@ public final class ResultAggregator {
                     (double) allDefect / count,
                     (double) (count - allCooperate - allDefect) / count,
                     Statistics.mean(measurementCooperation),
-                    Statistics.mean(measurementFlips)));
+                    Statistics.sampleStandardDeviation(measurementCooperation),
+                    Statistics.mean(measurementFlips),
+                    Statistics.sampleStandardDeviation(measurementFlips)));
         }
         return List.copyOf(aggregates);
     }

@@ -1,7 +1,7 @@
 package io.github.luciegrillo.civitas.core;
 
 /**
- * A pure strategy in the two-player Prisoner's Dilemma.
+ * A pure strategy in a two-strategy spatial game.
  */
 public enum Strategy {
     /** Cooperates with the interaction partner. */
@@ -16,11 +16,22 @@ public enum Strategy {
         this.code = code;
     }
 
-    byte code() {
+    /**
+     * Returns the compact lattice code.
+     *
+     * @return strategy code
+     */
+    public byte code() {
         return code;
     }
 
-    static Strategy fromCode(byte code) {
+    /**
+     * Decodes a compact lattice value.
+     *
+     * @param code strategy code
+     * @return decoded strategy
+     */
+    public static Strategy fromCode(byte code) {
         return switch (code) {
             case 0 -> COOPERATE;
             case 1 -> DEFECT;

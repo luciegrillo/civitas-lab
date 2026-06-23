@@ -8,7 +8,12 @@ The Gradle build has two modules:
 - `app`: CLI, strict JSON, orchestration, artifacts, and visualization.
 
 The core has no knowledge of files, JSON, charts, threads, or experiment
-batches. This keeps the transition rules independently testable and reusable.
+batches. This keeps the payoff rules, update rules, and transition engine
+independently testable and reusable.
+
+The v0.1 experiment schema still instantiates the documented weak Prisoner's
+Dilemma. Internally, the engine accepts any finite two-strategy payoff matrix
+and a local update rule with the same C/D state space.
 
 ## State Representation
 
@@ -20,6 +25,8 @@ The engine owns:
 - current and next strategy buffers;
 - one reusable payoff buffer;
 - immutable configuration;
+- a binary payoff rule;
+- a local strategy-update rule;
 - precomputed Moore neighborhoods.
 
 Public snapshots copy the strategy array. Internal generation steps allocate no
@@ -31,16 +38,19 @@ per-site objects.
 current strategies
        |
        v
-accumulate all payoffs
+accumulate payoffs from the configured binary game
        |
        v
-select every next strategy
+select every next strategy with the configured update rule
        |
        v
 swap current and next buffers
 ```
 
-Reading and writing different buffers prevents update-order artifacts.
+Reading and writing different buffers prevents update-order artifacts. The
+published v0.1 model uses weak Prisoner's Dilemma payoffs and deterministic
+unconditional imitation with focal-strategy retention on exact cross-strategy
+ties.
 
 ## Determinism
 
@@ -48,9 +58,9 @@ The transition engine contains no random operations. Bernoulli initialization
 uses the project-owned SplitMix64 implementation, tested against fixed vectors.
 Run seed derivation is stable and explicit.
 
-Separate best payoffs are tracked for `C` and `D`; exact cross-strategy ties
-retain the focal strategy. The rule avoids dependence on neighbor iteration
-order.
+Separate best payoffs are tracked for `C` and `D`; the v0.1 update rule retains
+the focal strategy on exact cross-strategy ties. The rule avoids dependence on
+neighbor iteration order.
 
 ## Concurrency
 
@@ -86,5 +96,5 @@ Versions are pinned through the Gradle version catalog and dependency lockfiles.
 
 v0.1 deliberately avoids a generic `Agent` hierarchy, event scheduler, graph
 abstraction, plugin system, database, GUI, JPMS modules, and distributed
-execution. Those abstractions will be introduced only when a concrete model
-requires them.
+execution. The current extension point is intentionally narrower: binary payoff
+rules and local binary update rules for the existing lattice engine.

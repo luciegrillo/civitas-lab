@@ -8,15 +8,41 @@ import java.util.Objects;
  * @param width lattice width
  * @param height lattice height
  * @param boundaryCondition edge behavior
- * @param game payoff model
+ * @param game pairwise payoff model
+ * @param updateRule local strategy selection rule
  * @param selfInteraction whether a player also plays against itself
  */
 public record SimulationConfig(
         int width,
         int height,
         BoundaryCondition boundaryCondition,
-        WeakPrisonersDilemma game,
+        BinaryPayoff game,
+        StrategyUpdateRule updateRule,
         boolean selfInteraction) {
+
+    /**
+     * Creates a simulation that uses deterministic unconditional imitation.
+     *
+     * @param width lattice width
+     * @param height lattice height
+     * @param boundaryCondition edge behavior
+     * @param game pairwise payoff model
+     * @param selfInteraction whether a player also plays against itself
+     */
+    public SimulationConfig(
+            int width,
+            int height,
+            BoundaryCondition boundaryCondition,
+            BinaryPayoff game,
+            boolean selfInteraction) {
+        this(
+                width,
+                height,
+                boundaryCondition,
+                game,
+                UnconditionalImitation.INSTANCE,
+                selfInteraction);
+    }
 
     /**
      * Creates validated simulation parameters.
@@ -28,6 +54,7 @@ public record SimulationConfig(
         }
         Objects.requireNonNull(boundaryCondition, "boundaryCondition");
         Objects.requireNonNull(game, "game");
+        Objects.requireNonNull(updateRule, "updateRule");
         Math.multiplyExact(width, height);
     }
 
