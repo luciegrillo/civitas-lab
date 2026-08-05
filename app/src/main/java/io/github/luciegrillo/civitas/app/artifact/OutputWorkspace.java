@@ -95,9 +95,7 @@ public final class OutputWorkspace implements AutoCloseable {
 
             move(stagingRoot, requestedRoot);
             published = true;
-            if (backup != null) {
-                deleteTree(backup);
-            }
+            deleteBackupBestEffort(backup);
             return requestedRoot;
         } catch (IOException exception) {
             if (destinationMoved && backup != null
@@ -125,6 +123,18 @@ public final class OutputWorkspace implements AutoCloseable {
         Path marker = Files.createTempFile(parent, "." + name + ".backup-", "");
         Files.delete(marker);
         return marker;
+    }
+
+    private static void deleteBackupBestEffort(Path backup) {
+        if (backup == null) {
+            return;
+        }
+        try {
+            deleteTree(backup);
+        } catch (IOException ignored) {
+            // Publication has already succeeded. A stale backup is safer than
+            // reporting failure after exposing a complete requested output.
+        }
     }
 
     private static void move(Path source, Path target) throws IOException {
