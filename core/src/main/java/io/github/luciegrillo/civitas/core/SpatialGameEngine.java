@@ -10,7 +10,7 @@ import java.util.Objects;
  * strategy chosen at generation {@code t+1} can affect another site during the
  * same generation.</p>
  */
-public final class SpatialGameEngine {
+public final class SpatialGameEngine implements SimulationEngine {
     private final SimulationConfig config;
     private final MooreNeighborhood neighborhoods;
     private final double[] payoffs;
@@ -49,6 +49,7 @@ public final class SpatialGameEngine {
      *
      * @return metrics for the resulting state
      */
+    @Override
     public StepMetrics step() {
         computePayoffs();
 
@@ -102,6 +103,7 @@ public final class SpatialGameEngine {
      *
      * @return immutable metrics
      */
+    @Override
     public StepMetrics metrics() {
         return metrics;
     }
@@ -111,6 +113,7 @@ public final class SpatialGameEngine {
      *
      * @return current generation and lattice
      */
+    @Override
     public SimulationSnapshot snapshot() {
         return new SimulationSnapshot(
                 generation,
