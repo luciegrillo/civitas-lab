@@ -76,6 +76,17 @@ Concurrency remains outside the v0.1 compatibility surface.
 Each run writes only inside its unique directory. After all runs complete, the
 coordinator writes aggregate CSV files and charts in deterministic group order.
 
+An experiment is assembled in a unique staging directory beside the requested
+output path. The final path is not created or replaced until every run,
+aggregate, figure, and checksum manifest has completed successfully. Publication
+then moves the staged directory into place. When overwrite is enabled, the
+previous output is moved aside first and restored if publication fails; the
+backup is deleted after the replacement succeeds.
+
+Closing an unpublished workspace removes its staging directory. A failed
+experiment therefore leaves neither a partial result at the requested path nor
+a staging tree intended to look like a completed output.
+
 Volatile provenance is separated from hashed scientific output. The
 `validate` command recomputes every listed SHA-256 digest and rejects missing,
 modified, or escaping paths.
