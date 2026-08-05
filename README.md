@@ -3,21 +3,43 @@
 [![CI](https://github.com/luciegrillo/civitas-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/luciegrillo/civitas-lab/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-Agent-based social simulation laboratory built in modern Java for reproducible
-computational experiments on emergence, cooperation, polarization, trust, and
-institutional dynamics.
+Reproducible experimental software for spatial evolutionary games, built in
+modern Java.
 
-## About
+Civitas Lab turns a versioned experiment configuration into deterministic
+simulation runs, aggregate statistics, figures, snapshots, provenance, and a
+SHA-256 manifest that can be validated independently. The published v0.1
+baseline reproduces documented synchronous spatial Prisoner's Dilemma regimes
+and includes a predeclared 1,200-run robustness study.
 
-Civitas Lab is an experimental computational social science platform. It
-explores how population-level patterns can emerge from simple local
-interactions between rule-based agents.
+## Published Baseline
 
-The first release focuses narrowly on reproducing the synchronous spatial
-Prisoner's Dilemma studied by Nowak and May. That baseline is intentionally
-small: it gives the project a published target, makes implementation choices
-visible, and provides a foundation for later models without claiming to explain
-real societies.
+Civitas Lab `v0.1.1` provides:
+
+- a dependency-free deterministic lattice engine;
+- synchronous double-buffered updates with explicit tie semantics;
+- bounded and toroidal Moore neighborhoods with optional self-interaction;
+- stable seed derivation and paired initial conditions;
+- strict, versioned JSON experiment configurations;
+- parallel execution with deterministic output ordering;
+- CSV, JSON, PNG, aggregate charts, provenance, and SHA-256 manifests;
+- historical frequency-profile and kaleidoscope scenarios;
+- a 1,200-run robustness study over model implementation choices.
+
+Download the executable and complete experiment outputs from the
+[v0.1.1 release](https://github.com/luciegrillo/civitas-lab/releases/tag/v0.1.1).
+
+## Why This Project Exists
+
+Agent-based simulations can produce compelling patterns while hiding the
+implementation choices that generated them. Civitas Lab makes those choices
+explicit and testable: configurations, seeds, update semantics, runtime
+metadata, and output checksums travel with each experiment.
+
+The first release is deliberately narrow. It uses a published spatial game as
+a validation target, exposes sensitivity to model choices, and establishes a
+reproducible foundation for later scheduling and network experiments without
+claiming to model real societies.
 
 ## Project Principles
 
@@ -29,19 +51,8 @@ real societies.
   its documented assumptions.
 - **Engineering-focused:** the mathematical core is isolated from CLI, storage,
   and visualization concerns.
-- **Incremental:** reputation, institutions, and complex networks arrive only
-  after the spatial baseline is verified.
-
-## Status
-
-Civitas Lab `v0.1.1` is the current patch release for the first published,
-reproducible spatial-cooperation baseline. Download the executable and complete
-experiment outputs from the
-[v0.1.1 release](https://github.com/luciegrillo/civitas-lab/releases/tag/v0.1.1).
-
-The current implementation includes the deterministic lattice engine, the
-reproducible experiment CLI, both historical scenarios, and the 1,200-run
-bounded robustness study.
+- **Incremental:** new mechanisms are added only after the existing baseline is
+  specified and verified.
 
 ## Quick Start
 
