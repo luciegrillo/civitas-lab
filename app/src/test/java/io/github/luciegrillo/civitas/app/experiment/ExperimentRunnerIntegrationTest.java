@@ -2,6 +2,7 @@ package io.github.luciegrillo.civitas.app.experiment;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,6 +30,7 @@ class ExperimentRunnerIntegrationTest {
 
         ExecutionReport report = new ExperimentRunner().run(experiment(2), output, false);
 
+        assertEquals(output.toAbsolutePath(), report.outputDirectory());
         assertEquals(4, report.runCount());
         assertTrue(Files.isRegularFile(output.resolve("resolved-experiment.json")));
         assertTrue(Files.isRegularFile(output.resolve("provenance.json")));
@@ -39,6 +41,8 @@ class ExperimentRunnerIntegrationTest {
         assertEquals(
                 4,
                 Files.list(output.resolve("runs")).filter(Files::isDirectory).count());
+        assertFalse(hasWorkspaceSibling(".artifacts.staging-"));
+        assertFalse(hasWorkspaceSibling(".artifacts.backup-"));
     }
 
     @Test
@@ -46,10 +50,15 @@ class ExperimentRunnerIntegrationTest {
         Path output = temporaryDirectory.resolve("artifacts");
         ExperimentRunner runner = new ExperimentRunner();
         runner.run(experiment(1), output, false);
+        byte[] originalManifest = Files.readAllBytes(output.resolve("checksums.sha256"));
 
         assertThrows(IOException.class, () -> runner.run(experiment(1), output, false));
+        assertArrayEquals(originalManifest, Files.readAllBytes(output.resolve("checksums.sha256")));
+
         runner.run(experiment(1), output, true);
         assertEquals(0, ChecksumManifest.validate(output).size());
+        assertFalse(hasWorkspaceSibling(".artifacts.staging-"));
+        assertFalse(hasWorkspaceSibling(".artifacts.backup-"));
     }
 
     @Test
@@ -76,6 +85,12 @@ class ExperimentRunnerIntegrationTest {
                         Files.readAllBytes(second),
                         relative.toString());
             }
+        }
+    }
+
+    private boolean hasWorkspaceSibling(String prefix) throws IOException {
+        try (var paths = Files.list(temporaryDirectory)) {
+            return paths.anyMatch(path -> path.getFileName().toString().startsWith(prefix));
         }
     }
 
