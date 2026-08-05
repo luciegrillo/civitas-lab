@@ -1,5 +1,6 @@
 package io.github.luciegrillo.civitas.app.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.luciegrillo.civitas.core.WeakPrisonersDilemma;
 import java.util.HashSet;
@@ -19,7 +20,37 @@ public record ScenarioSpec(
         @JsonProperty(required = true) int replicates,
         @JsonProperty(required = true) int ticks,
         @JsonProperty(required = true) int measurementStart,
-        @JsonProperty(required = true) List<Integer> snapshotTicks) {
+        @JsonProperty(required = true) List<Integer> snapshotTicks,
+        @JsonInclude(JsonInclude.Include.NON_NULL) UpdateScheduleSpec updateSchedule) {
+
+    /**
+     * Creates a synchronous scenario for programmatic callers using the legacy
+     * constructor shape.
+     */
+    public ScenarioSpec(
+            String id,
+            String seedGroup,
+            LatticeSpec lattice,
+            InitializationSpec initialization,
+            boolean selfInteraction,
+            List<Double> temptationValues,
+            int replicates,
+            int ticks,
+            int measurementStart,
+            List<Integer> snapshotTicks) {
+        this(
+                id,
+                seedGroup,
+                lattice,
+                initialization,
+                selfInteraction,
+                temptationValues,
+                replicates,
+                ticks,
+                measurementStart,
+                snapshotTicks,
+                UpdateScheduleSpec.synchronous());
+    }
 
     public ScenarioSpec {
         id = requireIdentifier(id, "scenario id");
@@ -64,6 +95,14 @@ public record ScenarioSpec(
             throw new IllegalArgumentException(
                     "CENTRAL_DEFECTOR requires odd lattice dimensions");
         }
+    }
+
+    /**
+     * Returns the schedule used by the simulation. Schema 0.1 scenarios omit
+     * the field and therefore retain synchronous semantics.
+     */
+    public UpdateScheduleSpec effectiveUpdateSchedule() {
+        return updateSchedule == null ? UpdateScheduleSpec.synchronous() : updateSchedule;
     }
 
     /**

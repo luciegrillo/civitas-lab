@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Complete machine-readable experiment definition.
@@ -15,12 +16,15 @@ public record ExperimentSpec(
         @JsonProperty(required = true) int parallelism,
         @JsonProperty(required = true) List<ScenarioSpec> scenarios) {
 
-    public static final String CURRENT_SCHEMA_VERSION = "0.1";
+    public static final String SCHEMA_VERSION_0_1 = "0.1";
+    public static final String CURRENT_SCHEMA_VERSION = "0.2";
+    private static final Set<String> SUPPORTED_SCHEMA_VERSIONS =
+            Set.of(SCHEMA_VERSION_0_1, CURRENT_SCHEMA_VERSION);
 
     public ExperimentSpec {
-        if (!CURRENT_SCHEMA_VERSION.equals(schemaVersion)) {
+        if (!SUPPORTED_SCHEMA_VERSIONS.contains(schemaVersion)) {
             throw new IllegalArgumentException(
-                    "schemaVersion must be " + CURRENT_SCHEMA_VERSION);
+                    "schemaVersion must be one of " + SUPPORTED_SCHEMA_VERSIONS);
         }
         Objects.requireNonNull(experimentId, "experimentId");
         experimentId = experimentId.strip();
@@ -37,9 +41,22 @@ public record ExperimentSpec(
         }
         HashSet<String> scenarioIds = new HashSet<>();
         for (ScenarioSpec scenario : scenarios) {
+            Objects.requireNonNull(scenario, "scenario");
             if (!scenarioIds.add(scenario.id())) {
                 throw new IllegalArgumentException(
                         "duplicate scenario id: " + scenario.id());
+            }
+            if (CURRENT_SCHEMA_VERSION.equals(schemaVersion)
+                    && scenario.updateSchedule() == null) {
+                throw new IllegalArgumentException(
+                        "schemaVersion 0.2 requires updateSchedule for every scenario");
+            }
+            if (SCHEMA_VERSION_0_1.equals(schemaVersion)
+                    && scenario.updateSchedule() != null
+                    && scenario.updateSchedule().type()
+                            != UpdateScheduleType.SYNCHRONOUS) {
+                throw new IllegalArgumentException(
+                        "schemaVersion 0.1 supports only synchronous updates");
             }
         }
     }
