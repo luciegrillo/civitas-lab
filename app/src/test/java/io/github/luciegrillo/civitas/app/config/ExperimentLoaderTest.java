@@ -73,9 +73,9 @@ class ExperimentLoaderTest {
     @Test
     void rejectsMissingScheduleFromSchema02() throws IOException {
         Path input = write(validJson02().replace(
-                "                      \"updateSchedule\": {\n"
-                        + "                        \"type\": \"RANDOM_SEQUENTIAL\"\n"
-                        + "                      },\n",
+                "      \"updateSchedule\": {\n"
+                        + "        \"type\": \"RANDOM_SEQUENTIAL\"\n"
+                        + "      },\n",
                 ""));
 
         IOException exception = assertThrows(
@@ -87,11 +87,11 @@ class ExperimentLoaderTest {
     @Test
     void rejectsScheduleFromSchema01() throws IOException {
         Path input = write(validJson01().replace(
-                "                      \"selfInteraction\": true,",
-                "                      \"selfInteraction\": true,\n"
-                        + "                      \"updateSchedule\": {\n"
-                        + "                        \"type\": \"SYNCHRONOUS\"\n"
-                        + "                      },"));
+                "\"selfInteraction\": true,",
+                "\"selfInteraction\": true,\n"
+                        + "      \"updateSchedule\": {\n"
+                        + "        \"type\": \"SYNCHRONOUS\"\n"
+                        + "      },"));
 
         IOException exception = assertThrows(
                 IOException.class, () -> new ExperimentLoader().load(input));
