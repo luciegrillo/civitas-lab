@@ -33,6 +33,26 @@ public final class SplitMix64 {
     }
 
     /**
+     * Produces an unbiased value in the half-open interval {@code [0, bound)}.
+     *
+     * @param bound exclusive positive upper bound
+     * @return uniformly distributed integer below {@code bound}
+     */
+    public int nextInt(int bound) {
+        if (bound <= 0) {
+            throw new IllegalArgumentException("bound must be positive");
+        }
+
+        long random = nextLong() >>> 1;
+        long remainder = random % bound;
+        while (random - remainder + (bound - 1L) < 0L) {
+            random = nextLong() >>> 1;
+            remainder = random % bound;
+        }
+        return (int) remainder;
+    }
+
+    /**
      * Produces a value in the half-open interval {@code [0, 1)}.
      *
      * @return uniformly distributed double with 53 random bits
