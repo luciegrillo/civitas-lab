@@ -67,6 +67,25 @@ reproduction commands are documented in the
 [baseline results](docs/results.md) and
 [robustness study](docs/robustness.md).
 
+## Scientific Scope
+
+Civitas Lab is currently a focused laboratory for one documented family of
+binary spatial evolutionary games. It verifies implementation rules and studies
+how selected model choices affect the resulting simulation behavior.
+
+| Implemented in v0.1 | Planned, not yet implemented |
+|---|---|
+| Synchronous spatial Prisoner's Dilemma | Asynchronous update schedules |
+| Bounded and toroidal square lattices | General graph topologies |
+| Deterministic unconditional imitation | Other documented update mechanisms |
+| Binary payoff and update-rule extension points | Reputation and assessment rules |
+| Reproducible experiment and artifact pipeline | Public-goods and institutional models |
+
+The current results support claims about the documented implementation and its
+behavior under the tested configurations. They do not establish that spatial
+structure universally promotes cooperation, predict human societies, or replace
+mature agent-based modeling platforms.
+
 ## Why This Project Exists
 
 Agent-based simulations can produce compelling patterns while hiding the
@@ -111,6 +130,16 @@ series and snapshots, aggregate tables, charts, and a SHA-256 manifest.
 
 See the [experiment format](docs/experiment-format.md) for the configuration
 contract.
+
+## Roadmap
+
+The next scientific milestone is scheduling robustness: defining and comparing
+asynchronous update semantics against the verified synchronous baseline. Later
+work may add graph topologies, reciprocity, reputation, public-goods games, and
+institutional mechanisms only with explicit model specifications and validation
+targets.
+
+See the full [roadmap](docs/roadmap.md) for direction and release boundaries.
 
 ## Documentation
 
