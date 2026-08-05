@@ -1,6 +1,7 @@
 package io.github.luciegrillo.civitas.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,24 @@ class SplitMix64Test {
         assertEquals(0x06c45d188009454fL, random.nextLong());
         assertEquals(0xf88bb8a8724c81ecL, random.nextLong());
         assertEquals(0x1b39896a51a8749bL, random.nextLong());
+    }
+
+    @Test
+    void boundedIntegersHaveStableSequence() {
+        SplitMix64 random = new SplitMix64(0);
+        int[] expected = {7, 0, 9, 2, 3, 5, 6, 0, 9, 5};
+
+        for (int value : expected) {
+            assertEquals(value, random.nextInt(10));
+        }
+    }
+
+    @Test
+    void rejectsNonPositiveIntegerBounds() {
+        SplitMix64 random = new SplitMix64(0);
+
+        assertThrows(IllegalArgumentException.class, () -> random.nextInt(0));
+        assertThrows(IllegalArgumentException.class, () -> random.nextInt(-1));
     }
 
     @Test
