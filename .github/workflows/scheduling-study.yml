@@ -1,0 +1,68 @@
+name: Scheduling Study
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/scheduling-study.yml"
+      - "configs/scheduling-robustness.json"
+      - "app/**"
+      - "core/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduling-study-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build and test
+        run: ./gradlew build --no-daemon
+
+      - name: Resolve executable JAR
+        shell: bash
+        run: |
+          mapfile -t jars < <(
+            find app/build/libs -maxdepth 1 -type f \
+              -name "civitas-lab-*.jar" ! -name "*-plain.jar" | sort
+          )
+          if (( ${#jars[@]} != 1 )); then
+            printf 'Expected one executable JAR, found %d\n' "${#jars[@]}" >&2
+            exit 1
+          fi
+          echo "CIVITAS_JAR=${jars[0]}" >> "$GITHUB_ENV"
+
+      - name: Run scheduling robustness study
+        run: |
+          java -jar "$CIVITAS_JAR" run \
+            configs/scheduling-robustness.json \
+            --output artifacts/scheduling-robustness
+          java -jar "$CIVITAS_JAR" validate artifacts/scheduling-robustness
+
+      - name: Upload study outputs
+        uses: actions/upload-artifact@v7
+        with:
+          name: scheduling-robustness-${{ github.sha }}
+          path: artifacts/scheduling-robustness/
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
