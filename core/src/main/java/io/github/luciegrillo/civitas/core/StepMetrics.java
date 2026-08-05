@@ -1,7 +1,7 @@
 package io.github.luciegrillo.civitas.core;
 
 /**
- * Aggregate state after a synchronous generation.
+ * Aggregate state after a complete simulation step.
  *
  * @param generation current generation, where zero is the initial state
  * @param cooperators number of cooperative sites
