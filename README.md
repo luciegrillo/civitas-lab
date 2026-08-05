@@ -3,21 +3,100 @@
 [![CI](https://github.com/luciegrillo/civitas-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/luciegrillo/civitas-lab/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-Agent-based social simulation laboratory built in modern Java for reproducible
-computational experiments on emergence, cooperation, polarization, trust, and
-institutional dynamics.
+Reproducible experimental software for spatial evolutionary games, built in
+modern Java.
 
-## About
+Civitas Lab turns a versioned experiment configuration into deterministic
+simulation runs, aggregate statistics, figures, snapshots, provenance, and a
+SHA-256 manifest that can be validated independently. The published v0.1
+baseline reproduces documented synchronous spatial Prisoner's Dilemma regimes
+and includes a predeclared 1,200-run robustness study.
 
-Civitas Lab is an experimental computational social science platform. It
-explores how population-level patterns can emerge from simple local
-interactions between rule-based agents.
+## Published Baseline
 
-The first release focuses narrowly on reproducing the synchronous spatial
-Prisoner's Dilemma studied by Nowak and May. That baseline is intentionally
-small: it gives the project a published target, makes implementation choices
-visible, and provides a foundation for later models without claiming to explain
-real societies.
+Civitas Lab `v0.1.1` provides:
+
+- a dependency-free deterministic lattice engine;
+- synchronous double-buffered updates with explicit tie semantics;
+- bounded and toroidal Moore neighborhoods with optional self-interaction;
+- stable seed derivation and paired initial conditions;
+- strict, versioned JSON experiment configurations;
+- parallel execution with deterministic output ordering;
+- CSV, JSON, PNG, aggregate charts, provenance, and SHA-256 manifests;
+- historical frequency-profile and kaleidoscope scenarios;
+- a 1,200-run robustness study over model implementation choices.
+
+Download the executable and complete experiment outputs from the
+[v0.1.1 release](https://github.com/luciegrillo/civitas-lab/releases/tag/v0.1.1).
+
+## Experiment Showcase
+
+### Scheduling-sensitive cooperation baseline
+
+The robustness suite executes 1,200 runs across temptation, boundaries,
+self-interaction, lattice sizes, and initial cooperator densities. It reports
+means together with dispersion, quantiles, and absorbing-state rates so that
+multimodal outcomes are not hidden behind one summary statistic.
+
+![Median final cooperation by scenario](docs/results/v0.1/robustness-comparison.png)
+
+At high temptation, removing self-interaction sharply reduces cooperation, and
+low initial cooperator density produces a mixture of all-defect,
+all-cooperate, and persistent mixed outcomes.
+
+![Density 0.3 distribution summary](docs/results/v0.1/robustness-density-30.png)
+
+### Spatial kaleidoscope
+
+A single central defector evolves inside a bounded `49×49` lattice of
+cooperators while preserving horizontal and vertical reflection symmetry.
+
+| Generation 20 | Generation 100 | Generation 179 |
+|---|---|---|
+| ![Generation 20](docs/results/v0.1/kaleidoscope-t020.png) | ![Generation 100](docs/results/v0.1/kaleidoscope-t100.png) | ![Generation 179](docs/results/v0.1/kaleidoscope-t179.png) |
+
+### Frequency profile
+
+A paired initial lattice is reused across twelve temptation values to expose
+how the same starting condition produces different cooperation trajectories.
+
+![Cooperator fraction over time](docs/results/v0.1/frequency-timeseries.png)
+
+The complete configurations, compact tables, interpretation boundaries, and
+reproduction commands are documented in the
+[baseline results](docs/results.md) and
+[robustness study](docs/robustness.md).
+
+## Scientific Scope
+
+Civitas Lab is currently a focused laboratory for one documented family of
+binary spatial evolutionary games. It verifies implementation rules and studies
+how selected model choices affect the resulting simulation behavior.
+
+| Implemented in v0.1 | Planned, not yet implemented |
+|---|---|
+| Synchronous spatial Prisoner's Dilemma | Asynchronous update schedules |
+| Bounded and toroidal square lattices | General graph topologies |
+| Deterministic unconditional imitation | Other documented update mechanisms |
+| Binary payoff and update-rule extension points | Reputation and assessment rules |
+| Reproducible experiment and artifact pipeline | Public-goods and institutional models |
+
+The current results support claims about the documented implementation and its
+behavior under the tested configurations. They do not establish that spatial
+structure universally promotes cooperation, predict human societies, or replace
+mature agent-based modeling platforms.
+
+## Why This Project Exists
+
+Agent-based simulations can produce compelling patterns while hiding the
+implementation choices that generated them. Civitas Lab makes those choices
+explicit and testable: configurations, seeds, update semantics, runtime
+metadata, and output checksums travel with each experiment.
+
+The first release is deliberately narrow. It uses a published spatial game as
+a validation target, exposes sensitivity to model choices, and establishes a
+reproducible foundation for later scheduling and network experiments without
+claiming to model real societies.
 
 ## Project Principles
 
@@ -29,19 +108,8 @@ real societies.
   its documented assumptions.
 - **Engineering-focused:** the mathematical core is isolated from CLI, storage,
   and visualization concerns.
-- **Incremental:** reputation, institutions, and complex networks arrive only
-  after the spatial baseline is verified.
-
-## Status
-
-Civitas Lab `v0.1.1` is the current patch release for the first published,
-reproducible spatial-cooperation baseline. Download the executable and complete
-experiment outputs from the
-[v0.1.1 release](https://github.com/luciegrillo/civitas-lab/releases/tag/v0.1.1).
-
-The current implementation includes the deterministic lattice engine, the
-reproducible experiment CLI, both historical scenarios, and the 1,200-run
-bounded robustness study.
+- **Incremental:** new mechanisms are added only after the existing baseline is
+  specified and verified.
 
 ## Quick Start
 
@@ -62,6 +130,16 @@ series and snapshots, aggregate tables, charts, and a SHA-256 manifest.
 
 See the [experiment format](docs/experiment-format.md) for the configuration
 contract.
+
+## Roadmap
+
+The next scientific milestone is scheduling robustness: defining and comparing
+asynchronous update semantics against the verified synchronous baseline. Later
+work may add graph topologies, reciprocity, reputation, public-goods games, and
+institutional mechanisms only with explicit model specifications and validation
+targets.
+
+See the full [roadmap](docs/roadmap.md) for direction and release boundaries.
 
 ## Documentation
 
