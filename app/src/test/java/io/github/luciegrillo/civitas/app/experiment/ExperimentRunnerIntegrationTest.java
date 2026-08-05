@@ -30,7 +30,7 @@ class ExperimentRunnerIntegrationTest {
 
         ExecutionReport report = new ExperimentRunner().run(experiment(2), output, false);
 
-        assertEquals(output.toAbsolutePath(), report.output());
+        assertEquals(output.toAbsolutePath(), report.outputDirectory());
         assertEquals(4, report.runCount());
         assertTrue(Files.isRegularFile(output.resolve("resolved-experiment.json")));
         assertTrue(Files.isRegularFile(output.resolve("provenance.json")));
