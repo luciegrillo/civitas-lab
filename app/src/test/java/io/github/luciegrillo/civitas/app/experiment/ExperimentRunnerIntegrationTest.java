@@ -12,6 +12,8 @@ import io.github.luciegrillo.civitas.app.config.InitializationSpec;
 import io.github.luciegrillo.civitas.app.config.InitializationType;
 import io.github.luciegrillo.civitas.app.config.LatticeSpec;
 import io.github.luciegrillo.civitas.app.config.ScenarioSpec;
+import io.github.luciegrillo.civitas.app.config.UpdateScheduleSpec;
+import io.github.luciegrillo.civitas.app.config.UpdateScheduleType;
 import io.github.luciegrillo.civitas.core.BoundaryCondition;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,8 +43,28 @@ class ExperimentRunnerIntegrationTest {
         assertEquals(
                 4,
                 Files.list(output.resolve("runs")).filter(Files::isDirectory).count());
+        String metadata = Files.readString(output.resolve(
+                "runs/baseline__b-1_15__r-000/metadata.json"));
+        assertTrue(metadata.contains("\"type\" : \"SYNCHRONOUS\""));
+        assertTrue(metadata.contains("\"scheduleSeed\""));
         assertFalse(hasWorkspaceSibling(".artifacts.staging-"));
         assertFalse(hasWorkspaceSibling(".artifacts.backup-"));
+    }
+
+    @Test
+    void executesRandomSequentialScenarios() throws IOException {
+        Path output = temporaryDirectory.resolve("random-sequential");
+
+        ExecutionReport report = new ExperimentRunner().run(
+                scheduleExperiment(UpdateScheduleType.RANDOM_SEQUENTIAL), output, false);
+
+        assertEquals(1, report.runCount());
+        assertEquals(0, ChecksumManifest.validate(output).size());
+        String metadata = Files.readString(output.resolve(
+                "runs/random-sequential__b-1_85__r-000/metadata.json"));
+        assertTrue(metadata.contains("\"type\" : \"RANDOM_SEQUENTIAL\""));
+        assertTrue(Files.isRegularFile(output.resolve(
+                "runs/random-sequential__b-1_85__r-000/timeseries.csv")));
     }
 
     @Test
@@ -111,6 +133,27 @@ class ExperimentRunnerIntegrationTest {
                 "integration-test",
                 19920359L,
                 parallelism,
+                List.of(scenario));
+    }
+
+    private static ExperimentSpec scheduleExperiment(UpdateScheduleType type) {
+        ScenarioSpec scenario = new ScenarioSpec(
+                type.name().toLowerCase().replace('_', '-'),
+                "paired-schedule",
+                new LatticeSpec(9, 9, BoundaryCondition.TOROIDAL),
+                new InitializationSpec(InitializationType.BERNOULLI, 0.9),
+                true,
+                List.of(1.85),
+                1,
+                10,
+                5,
+                List.of(0, 10),
+                new UpdateScheduleSpec(type));
+        return new ExperimentSpec(
+                ExperimentSpec.CURRENT_SCHEMA_VERSION,
+                "schedule-integration-test",
+                19920359L,
+                1,
                 List.of(scenario));
     }
 }

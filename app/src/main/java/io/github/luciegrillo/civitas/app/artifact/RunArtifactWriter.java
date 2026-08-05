@@ -1,5 +1,6 @@
 package io.github.luciegrillo.civitas.app.artifact;
 
+import io.github.luciegrillo.civitas.app.config.UpdateScheduleSpec;
 import io.github.luciegrillo.civitas.app.experiment.RunPlan;
 import io.github.luciegrillo.civitas.app.experiment.TimePoint;
 import io.github.luciegrillo.civitas.core.Lattice;
@@ -15,13 +16,16 @@ public final class RunArtifactWriter {
 
     public RunArtifactWriter(OutputWorkspace workspace, RunPlan plan) throws IOException {
         runDirectory = workspace.runDirectory(plan.runId());
+        UpdateScheduleSpec schedule = plan.scenario().updateSchedule();
         RunMetadata metadata = new RunMetadata(
                 plan.runId(),
                 plan.scenario().id(),
                 plan.scenario().seedGroup(),
                 plan.temptation(),
                 plan.replicate(),
-                plan.seed(),
+                plan.initializationSeed(),
+                schedule,
+                schedule == null ? null : plan.scheduleSeed(),
                 plan.scenario().lattice(),
                 plan.scenario().initialization(),
                 plan.scenario().selfInteraction(),

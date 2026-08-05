@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luciegrillo/civitas-lab/schemas/experiment-0.2.schema.json",
+  "title": "Civitas Lab experiment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "experimentId",
+    "masterSeed",
+    "parallelism",
+    "scenarios"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "0.2"
+    },
+    "experimentId": {
+      "$ref": "#/$defs/identifier"
+    },
+    "masterSeed": {
+      "type": "integer"
+    },
+    "parallelism": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 256
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/scenario"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "seedGroup",
+        "lattice",
+        "initialization",
+        "selfInteraction",
+        "temptationValues",
+        "replicates",
+        "ticks",
+        "measurementStart",
+        "snapshotTicks",
+        "updateSchedule"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "seedGroup": {
+          "$ref": "#/$defs/identifier"
+        },
+        "lattice": {
+          "$ref": "#/$defs/lattice"
+        },
+        "initialization": {
+          "$ref": "#/$defs/initialization"
+        },
+        "selfInteraction": {
+          "type": "boolean"
+        },
+        "temptationValues": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 1,
+            "maximum": 2
+          }
+        },
+        "replicates": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ticks": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "measurementStart": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "snapshotTicks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "updateSchedule": {
+          "$ref": "#/$defs/updateSchedule"
+        }
+      }
+    },
+    "lattice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height",
+        "boundary"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 3
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 3
+        },
+        "boundary": {
+          "enum": [
+            "TOROIDAL",
+            "BOUNDED"
+          ]
+        }
+      }
+    },
+    "initialization": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "CENTRAL_DEFECTOR"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "pCooperator"
+          ],
+          "properties": {
+            "type": {
+              "const": "BERNOULLI"
+            },
+            "pCooperator": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        }
+      ]
+    },
+    "updateSchedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "SYNCHRONOUS",
+            "RANDOM_SEQUENTIAL"
+          ]
+        }
+      }
+    }
+  }
+}

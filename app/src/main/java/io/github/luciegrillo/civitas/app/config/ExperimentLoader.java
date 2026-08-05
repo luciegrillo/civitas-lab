@@ -54,44 +54,74 @@ public final class ExperimentLoader {
                 "masterSeed",
                 "parallelism",
                 "scenarios");
+        String schemaVersion = requireSchemaVersion(document.get("schemaVersion"));
         JsonNode scenarios = document.get("scenarios");
         if (scenarios == null || !scenarios.isArray()) {
             throw new IllegalArgumentException("$.scenarios must be an array");
         }
         for (int index = 0; index < scenarios.size(); index++) {
-            JsonNode scenario = scenarios.get(index);
-            String path = "$.scenarios[" + index + "]";
-            requireObject(scenario, path);
-            requireProperties(
-                    scenario,
-                    path,
-                    "id",
-                    "seedGroup",
-                    "lattice",
-                    "initialization",
-                    "selfInteraction",
-                    "temptationValues",
-                    "replicates",
-                    "ticks",
-                    "measurementStart",
-                    "snapshotTicks");
-
-            JsonNode lattice = scenario.get("lattice");
-            requireObject(lattice, path + ".lattice");
-            requireProperties(lattice, path + ".lattice", "width", "height", "boundary");
-
-            JsonNode initialization = scenario.get("initialization");
-            requireObject(initialization, path + ".initialization");
-            requireProperties(initialization, path + ".initialization", "type");
-            JsonNode type = initialization.get("type");
-            if (type != null
-                    && type.isString()
-                    && "BERNOULLI".equals(type.stringValue())
-                    && !initialization.has("pCooperator")) {
-                throw new IllegalArgumentException(
-                        path + ".initialization is missing pCooperator");
-            }
+            requireScenarioShape(scenarios.get(index), index, schemaVersion);
         }
+    }
+
+    private static String requireSchemaVersion(JsonNode node) {
+        if (node == null || !node.isString()) {
+            throw new IllegalArgumentException("$.schemaVersion must be a string");
+        }
+        String version = node.stringValue();
+        if (!ExperimentSpec.SCHEMA_VERSION_0_1.equals(version)
+                && !ExperimentSpec.CURRENT_SCHEMA_VERSION.equals(version)) {
+            throw new IllegalArgumentException("unsupported schemaVersion: " + version);
+        }
+        return version;
+    }
+
+    private static void requireScenarioShape(
+            JsonNode scenario, int index, String schemaVersion) {
+        String path = "$.scenarios[" + index + "]";
+        requireObject(scenario, path);
+        requireProperties(
+                scenario,
+                path,
+                "id",
+                "seedGroup",
+                "lattice",
+                "initialization",
+                "selfInteraction",
+                "temptationValues",
+                "replicates",
+                "ticks",
+                "measurementStart",
+                "snapshotTicks");
+
+        JsonNode lattice = scenario.get("lattice");
+        requireObject(lattice, path + ".lattice");
+        requireProperties(lattice, path + ".lattice", "width", "height", "boundary");
+
+        JsonNode initialization = scenario.get("initialization");
+        requireObject(initialization, path + ".initialization");
+        requireProperties(initialization, path + ".initialization", "type");
+        JsonNode type = initialization.get("type");
+        if (type != null
+                && type.isString()
+                && "BERNOULLI".equals(type.stringValue())
+                && !initialization.has("pCooperator")) {
+            throw new IllegalArgumentException(
+                    path + ".initialization is missing pCooperator");
+        }
+
+        if (ExperimentSpec.SCHEMA_VERSION_0_1.equals(schemaVersion)) {
+            if (scenario.has("updateSchedule")) {
+                throw new IllegalArgumentException(
+                        path + ".updateSchedule is not supported by schemaVersion 0.1");
+            }
+            return;
+        }
+
+        requireProperties(scenario, path, "updateSchedule");
+        JsonNode updateSchedule = scenario.get("updateSchedule");
+        requireObject(updateSchedule, path + ".updateSchedule");
+        requireProperties(updateSchedule, path + ".updateSchedule", "type");
     }
 
     private static void requireObject(JsonNode node, String path) {

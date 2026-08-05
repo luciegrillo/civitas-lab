@@ -6,7 +6,7 @@ import io.github.luciegrillo.civitas.app.config.InitializationType;
 import io.github.luciegrillo.civitas.core.Lattice;
 import io.github.luciegrillo.civitas.core.LatticeInitializers;
 import io.github.luciegrillo.civitas.core.SimulationConfig;
-import io.github.luciegrillo.civitas.core.SpatialGameEngine;
+import io.github.luciegrillo.civitas.core.SimulationEngine;
 import io.github.luciegrillo.civitas.core.StepMetrics;
 import io.github.luciegrillo.civitas.core.WeakPrisonersDilemma;
 import java.util.ArrayList;
@@ -36,7 +36,8 @@ public final class SimulationTask implements Callable<RunResult> {
                 plan.scenario().lattice().boundary(),
                 new WeakPrisonersDilemma(plan.temptation()),
                 plan.scenario().selfInteraction());
-        SpatialGameEngine engine = new SpatialGameEngine(config, initial);
+        SimulationEngine engine = SimulationEngineFactory.create(
+                plan.scenario(), config, initial, plan.scheduleSeed());
         RunArtifactWriter artifacts = new RunArtifactWriter(workspace, plan);
 
         ArrayList<TimePoint> points = new ArrayList<>(plan.scenario().ticks() + 1);
@@ -83,7 +84,7 @@ public final class SimulationTask implements Callable<RunResult> {
                 width,
                 height,
                 plan.scenario().initialization().pCooperator(),
-                plan.seed());
+                plan.initializationSeed());
     }
 
     private RunSummary summarize(List<TimePoint> points) {
@@ -108,7 +109,7 @@ public final class SimulationTask implements Callable<RunResult> {
                 plan.scenario().id(),
                 plan.temptation(),
                 plan.replicate(),
-                plan.seed(),
+                plan.initializationSeed(),
                 finalPoint.cooperatorFraction(),
                 cooperationSum / measurement.size(),
                 flipSum / measurement.size(),

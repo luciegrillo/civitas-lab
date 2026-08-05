@@ -10,6 +10,8 @@ import java.util.List;
  * Expands a compact experiment specification into deterministic run plans.
  */
 public final class RunPlanner {
+    private static final String SCHEDULE_SEED_DOMAIN = "schedule";
+
     private RunPlanner() {
     }
 
@@ -21,13 +23,19 @@ public final class RunPlanner {
         for (ScenarioSpec scenario : experiment.scenarios()) {
             for (double temptation : scenario.temptationValues()) {
                 for (int replicate = 0; replicate < scenario.replicates(); replicate++) {
-                    long seed = SeedDerivation.derive(
+                    long initializationSeed = SeedDerivation.derive(
                             experiment.masterSeed(), scenario.seedGroup(), replicate);
+                    long scheduleSeed = SeedDerivation.derive(
+                            experiment.masterSeed(),
+                            SCHEDULE_SEED_DOMAIN,
+                            scenario.seedGroup(),
+                            replicate);
                     plans.add(new RunPlan(
                             scenario,
                             temptation,
                             replicate,
-                            seed,
+                            initializationSeed,
+                            scheduleSeed,
                             RunPlan.createId(scenario.id(), temptation, replicate)));
                 }
             }
