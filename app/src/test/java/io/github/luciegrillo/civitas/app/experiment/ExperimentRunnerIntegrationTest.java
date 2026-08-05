@@ -47,8 +47,30 @@ class ExperimentRunnerIntegrationTest {
                 "runs/baseline__b-1_15__r-000/metadata.json"));
         assertTrue(metadata.contains("\"type\" : \"SYNCHRONOUS\""));
         assertTrue(metadata.contains("\"scheduleSeed\""));
+        assertTrue(Files.readString(output.resolve("summary.csv"))
+                .startsWith("scenario_id,update_schedule,temptation,replicate,"
+                        + "initialization_seed,schedule_seed,"));
+        assertTrue(Files.readString(output.resolve("aggregate.csv"))
+                .startsWith("scenario_id,update_schedule,temptation,runs,"));
         assertFalse(hasWorkspaceSibling(".artifacts.staging-"));
         assertFalse(hasWorkspaceSibling(".artifacts.backup-"));
+    }
+
+    @Test
+    void preservesLegacySchema01CsvContract() throws IOException {
+        Path output = temporaryDirectory.resolve("legacy");
+
+        new ExperimentRunner().run(legacyExperiment(), output, false);
+
+        assertTrue(Files.readString(output.resolve("summary.csv")).startsWith(
+                "scenario_id,temptation,replicate,seed,final_cooperator_fraction,"));
+        assertTrue(Files.readString(output.resolve("aggregate.csv")).startsWith(
+                "scenario_id,temptation,runs,final_mean,final_sd,"));
+        assertFalse(Files.readString(output.resolve("summary.csv"))
+                .contains("update_schedule"));
+        assertFalse(Files.readString(output.resolve("aggregate.csv"))
+                .contains("update_schedule"));
+        assertEquals(0, ChecksumManifest.validate(output).size());
     }
 
     @Test
@@ -133,6 +155,27 @@ class ExperimentRunnerIntegrationTest {
                 "integration-test",
                 19920359L,
                 parallelism,
+                List.of(scenario));
+    }
+
+    private static ExperimentSpec legacyExperiment() {
+        ScenarioSpec scenario = new ScenarioSpec(
+                "baseline",
+                "paired-initialization",
+                new LatticeSpec(9, 9, BoundaryCondition.TOROIDAL),
+                new InitializationSpec(InitializationType.BERNOULLI, 0.9),
+                true,
+                List.of(1.15),
+                1,
+                5,
+                2,
+                List.of(0, 5),
+                null);
+        return new ExperimentSpec(
+                ExperimentSpec.SCHEMA_VERSION_0_1,
+                "legacy-integration-test",
+                19920359L,
+                1,
                 List.of(scenario));
     }
 
