@@ -1,5 +1,6 @@
 package io.github.luciegrillo.civitas.app.artifact;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,6 +17,67 @@ import org.junit.jupiter.api.io.TempDir;
 class OutputWorkspaceTest {
     @TempDir
     Path temporaryDirectory;
+
+    @Test
+    void stagesBesideRequestedOutputAndPublishesOnlyWhenComplete() throws IOException {
+        Path output = temporaryDirectory.resolve("artifacts");
+        Path staging;
+
+        try (OutputWorkspace workspace = OutputWorkspace.prepare(output, false)) {
+            staging = workspace.root();
+            assertEquals(temporaryDirectory, staging.getParent());
+            assertTrue(staging.getFileName().toString().startsWith(".artifacts.staging-"));
+            assertFalse(Files.exists(output));
+
+            Files.writeString(staging.resolve("complete.txt"), "complete\n");
+            assertEquals(output.toAbsolutePath(), workspace.publish());
+        }
+
+        assertFalse(Files.exists(staging));
+        assertEquals("complete\n", Files.readString(output.resolve("complete.txt")));
+    }
+
+    @Test
+    void removesUnpublishedStagingDirectoryOnClose() throws IOException {
+        Path output = temporaryDirectory.resolve("artifacts");
+        Path staging;
+
+        try (OutputWorkspace workspace = OutputWorkspace.prepare(output, false)) {
+            staging = workspace.root();
+            Files.writeString(staging.resolve("partial.txt"), "partial\n");
+        }
+
+        assertFalse(Files.exists(staging));
+        assertFalse(Files.exists(output));
+    }
+
+    @Test
+    void overwritePreservesExistingOutputUntilPublication() throws IOException {
+        Path output = temporaryDirectory.resolve("artifacts");
+        Files.createDirectories(output);
+        Files.writeString(output.resolve("old.txt"), "old\n");
+
+        try (OutputWorkspace workspace = OutputWorkspace.prepare(output, true)) {
+            Files.writeString(workspace.root().resolve("new.txt"), "new\n");
+            assertEquals("old\n", Files.readString(output.resolve("old.txt")));
+            workspace.publish();
+        }
+
+        assertFalse(Files.exists(output.resolve("old.txt")));
+        assertEquals("new\n", Files.readString(output.resolve("new.txt")));
+    }
+
+    @Test
+    void rejectsExistingOutputWithoutOverwrite() throws IOException {
+        Path output = temporaryDirectory.resolve("artifacts");
+        Files.createDirectories(output);
+
+        IOException exception = assertThrows(
+                IOException.class,
+                () -> OutputWorkspace.prepare(output, false));
+
+        assertTrue(exception.getMessage().contains("use --overwrite"));
+    }
 
     @Test
     void refusesOverwriteWhenOutputRootIsSymlink() throws IOException {
