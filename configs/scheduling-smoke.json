@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "0.2",
+  "experimentId": "scheduling-smoke",
+  "masterSeed": 19920359,
+  "parallelism": 2,
+  "scenarios": [
+    {
+      "id": "synchronous",
+      "seedGroup": "paired-schedule",
+      "lattice": {
+        "width": 25,
+        "height": 25,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.9
+      },
+      "selfInteraction": true,
+      "updateSchedule": {
+        "type": "SYNCHRONOUS"
+      },
+      "temptationValues": [1.85],
+      "replicates": 2,
+      "ticks": 25,
+      "measurementStart": 10,
+      "snapshotTicks": [0, 25]
+    },
+    {
+      "id": "random-sequential",
+      "seedGroup": "paired-schedule",
+      "lattice": {
+        "width": 25,
+        "height": 25,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.9
+      },
+      "selfInteraction": true,
+      "updateSchedule": {
+        "type": "RANDOM_SEQUENTIAL"
+      },
+      "temptationValues": [1.85],
+      "replicates": 2,
+      "ticks": 25,
+      "measurementStart": 10,
+      "snapshotTicks": [0, 25]
+    }
+  ]
+}
