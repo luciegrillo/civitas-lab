@@ -27,36 +27,38 @@ public final class ExperimentRunner {
     public ExecutionReport run(
             ExperimentSpec experiment, Path output, boolean overwrite) throws IOException {
         long started = System.nanoTime();
-        OutputWorkspace workspace = OutputWorkspace.prepare(output, overwrite);
-        JsonArtifacts.write(workspace.root().resolve("resolved-experiment.json"), experiment);
-        JsonArtifacts.write(workspace.root().resolve("provenance.json"), Provenance.capture());
+        try (OutputWorkspace workspace = OutputWorkspace.prepare(output, overwrite)) {
+            JsonArtifacts.write(workspace.root().resolve("resolved-experiment.json"), experiment);
+            JsonArtifacts.write(workspace.root().resolve("provenance.json"), Provenance.capture());
 
-        List<RunPlan> plans = RunPlanner.expand(experiment);
-        ArrayList<Future<RunResult>> futures = new ArrayList<>(plans.size());
-        ArrayList<RunResult> results = new ArrayList<>(plans.size());
+            List<RunPlan> plans = RunPlanner.expand(experiment);
+            ArrayList<Future<RunResult>> futures = new ArrayList<>(plans.size());
+            ArrayList<RunResult> results = new ArrayList<>(plans.size());
 
-        try (ExecutorService executor =
-                Executors.newFixedThreadPool(Math.min(experiment.parallelism(), plans.size()))) {
-            for (RunPlan plan : plans) {
-                futures.add(executor.submit(new SimulationTask(plan, workspace)));
+            try (ExecutorService executor =
+                    Executors.newFixedThreadPool(Math.min(experiment.parallelism(), plans.size()))) {
+                for (RunPlan plan : plans) {
+                    futures.add(executor.submit(new SimulationTask(plan, workspace)));
+                }
+                for (Future<RunResult> future : futures) {
+                    results.add(await(future));
+                }
             }
-            for (Future<RunResult> future : futures) {
-                results.add(await(future));
-            }
+
+            List<RunResult> immutableResults = List.copyOf(results);
+            List<AggregateSummary> aggregates = ResultAggregator.aggregate(immutableResults);
+            CsvArtifacts.writeRunSummaries(
+                    workspace.root().resolve("summary.csv"), immutableResults);
+            CsvArtifacts.writeAggregates(
+                    workspace.root().resolve("aggregate.csv"), aggregates);
+            ChartRenderer.writeAll(
+                    workspace.root().resolve("figures"), immutableResults, aggregates);
+            ChecksumManifest.write(workspace.root());
+
+            Path publishedOutput = workspace.publish();
+            long elapsedMillis = (System.nanoTime() - started) / 1_000_000;
+            return new ExecutionReport(publishedOutput, plans.size(), elapsedMillis);
         }
-
-        List<RunResult> immutableResults = List.copyOf(results);
-        List<AggregateSummary> aggregates = ResultAggregator.aggregate(immutableResults);
-        CsvArtifacts.writeRunSummaries(
-                workspace.root().resolve("summary.csv"), immutableResults);
-        CsvArtifacts.writeAggregates(
-                workspace.root().resolve("aggregate.csv"), aggregates);
-        ChartRenderer.writeAll(
-                workspace.root().resolve("figures"), immutableResults, aggregates);
-        ChecksumManifest.write(workspace.root());
-
-        long elapsedMillis = (System.nanoTime() - started) / 1_000_000;
-        return new ExecutionReport(workspace.root(), plans.size(), elapsedMillis);
     }
 
     private static RunResult await(Future<RunResult> future) throws IOException {
