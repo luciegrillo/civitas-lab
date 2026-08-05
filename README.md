@@ -29,6 +29,44 @@ Civitas Lab `v0.1.1` provides:
 Download the executable and complete experiment outputs from the
 [v0.1.1 release](https://github.com/luciegrillo/civitas-lab/releases/tag/v0.1.1).
 
+## Experiment Showcase
+
+### Scheduling-sensitive cooperation baseline
+
+The robustness suite executes 1,200 runs across temptation, boundaries,
+self-interaction, lattice sizes, and initial cooperator densities. It reports
+means together with dispersion, quantiles, and absorbing-state rates so that
+multimodal outcomes are not hidden behind one summary statistic.
+
+![Median final cooperation by scenario](docs/results/v0.1/robustness-comparison.png)
+
+At high temptation, removing self-interaction sharply reduces cooperation, and
+low initial cooperator density produces a mixture of all-defect,
+all-cooperate, and persistent mixed outcomes.
+
+![Density 0.3 distribution summary](docs/results/v0.1/robustness-density-30.png)
+
+### Spatial kaleidoscope
+
+A single central defector evolves inside a bounded `49×49` lattice of
+cooperators while preserving horizontal and vertical reflection symmetry.
+
+| Generation 20 | Generation 100 | Generation 179 |
+|---|---|---|
+| ![Generation 20](docs/results/v0.1/kaleidoscope-t020.png) | ![Generation 100](docs/results/v0.1/kaleidoscope-t100.png) | ![Generation 179](docs/results/v0.1/kaleidoscope-t179.png) |
+
+### Frequency profile
+
+A paired initial lattice is reused across twelve temptation values to expose
+how the same starting condition produces different cooperation trajectories.
+
+![Cooperator fraction over time](docs/results/v0.1/frequency-timeseries.png)
+
+The complete configurations, compact tables, interpretation boundaries, and
+reproduction commands are documented in the
+[baseline results](docs/results.md) and
+[robustness study](docs/robustness.md).
+
 ## Why This Project Exists
 
 Agent-based simulations can produce compelling patterns while hiding the
