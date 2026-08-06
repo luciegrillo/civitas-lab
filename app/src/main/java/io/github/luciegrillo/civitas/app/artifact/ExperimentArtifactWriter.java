@@ -18,7 +18,8 @@ public final class ExperimentArtifactWriter {
     }
 
     /**
-     * Writes deterministic aggregate tables and figures.
+     * Writes deterministic aggregate tables, figures, and schema-specific
+     * reports.
      */
     public void write(
             ExperimentSpec experiment,
@@ -34,5 +35,14 @@ public final class ExperimentArtifactWriter {
                 workspace.root().resolve("aggregate.csv"), aggregates);
         ChartRenderer.writeAll(
                 workspace.root().resolve("figures"), results, aggregates);
+
+        if (ExperimentSpec.CURRENT_SCHEMA_VERSION.equals(experiment.schemaVersion())) {
+            HtmlReportWriter.write(
+                    workspace.root().resolve(HtmlReportWriter.FILE_NAME),
+                    experiment,
+                    results,
+                    aggregates,
+                    workspace.root().resolve("figures"));
+        }
     }
 }
