@@ -33,17 +33,35 @@ public final class CsvArtifacts {
     }
 
     public static void writeRunSummaries(Path path, List<RunResult> results) throws IOException {
-        StringBuilder csv = new StringBuilder(
-                "scenario_id,temptation,replicate,seed,final_cooperator_fraction,"
-                        + "measurement_mean_cooperator_fraction,measurement_mean_flip_rate,"
-                        + "final_population_state\n");
+        boolean scheduleAware = results.stream()
+                .anyMatch(result -> result.plan().scenario().updateSchedule() != null);
+        StringBuilder csv = new StringBuilder();
+        if (scheduleAware) {
+            csv.append("scenario_id,update_schedule,temptation,replicate,"
+                    + "initialization_seed,schedule_seed,final_cooperator_fraction,"
+                    + "measurement_mean_cooperator_fraction,measurement_mean_flip_rate,"
+                    + "final_population_state\n");
+        } else {
+            csv.append("scenario_id,temptation,replicate,seed,final_cooperator_fraction,"
+                    + "measurement_mean_cooperator_fraction,measurement_mean_flip_rate,"
+                    + "final_population_state\n");
+        }
+
         for (RunResult result : results) {
             RunSummary summary = result.summary();
-            csv.append(summary.scenarioId()).append(',')
-                    .append(format(summary.temptation())).append(',')
-                    .append(summary.replicate()).append(',')
-                    .append(summary.seed()).append(',')
-                    .append(format(summary.finalCooperatorFraction())).append(',')
+            csv.append(summary.scenarioId()).append(',');
+            if (scheduleAware) {
+                csv.append(result.plan().scenario().effectiveUpdateSchedule().type()).append(',')
+                        .append(format(summary.temptation())).append(',')
+                        .append(summary.replicate()).append(',')
+                        .append(result.plan().initializationSeed()).append(',')
+                        .append(result.plan().scheduleSeed()).append(',');
+            } else {
+                csv.append(format(summary.temptation())).append(',')
+                        .append(summary.replicate()).append(',')
+                        .append(summary.seed()).append(',');
+            }
+            csv.append(format(summary.finalCooperatorFraction())).append(',')
                     .append(format(summary.measurementMeanCooperatorFraction())).append(',')
                     .append(format(summary.measurementMeanFlipRate())).append(',')
                     .append(summary.finalPopulationState()).append('\n');
@@ -53,15 +71,29 @@ public final class CsvArtifacts {
 
     public static void writeAggregates(
             Path path, List<AggregateSummary> aggregates) throws IOException {
-        StringBuilder csv = new StringBuilder(
-                "scenario_id,temptation,runs,final_mean,final_sd,final_q05,final_q25,"
-                        + "final_median,final_q75,final_q95,all_cooperate_rate,"
-                        + "all_defect_rate,mixed_rate,measurement_mean_cooperator_fraction,"
-                        + "measurement_cooperator_fraction_sd,measurement_mean_flip_rate,"
-                        + "measurement_flip_rate_sd\n");
+        boolean scheduleAware = aggregates.stream()
+                .anyMatch(aggregate -> aggregate.updateSchedule() != null);
+        StringBuilder csv = new StringBuilder();
+        if (scheduleAware) {
+            csv.append("scenario_id,update_schedule,temptation,runs,final_mean,final_sd,"
+                    + "final_q05,final_q25,final_median,final_q75,final_q95,"
+                    + "all_cooperate_rate,all_defect_rate,mixed_rate,"
+                    + "measurement_mean_cooperator_fraction,"
+                    + "measurement_cooperator_fraction_sd,measurement_mean_flip_rate,"
+                    + "measurement_flip_rate_sd\n");
+        } else {
+            csv.append("scenario_id,temptation,runs,final_mean,final_sd,final_q05,final_q25,"
+                    + "final_median,final_q75,final_q95,all_cooperate_rate,"
+                    + "all_defect_rate,mixed_rate,measurement_mean_cooperator_fraction,"
+                    + "measurement_cooperator_fraction_sd,measurement_mean_flip_rate,"
+                    + "measurement_flip_rate_sd\n");
+        }
         for (AggregateSummary aggregate : aggregates) {
-            csv.append(aggregate.scenarioId()).append(',')
-                    .append(format(aggregate.temptation())).append(',')
+            csv.append(aggregate.scenarioId()).append(',');
+            if (scheduleAware) {
+                csv.append(aggregate.updateSchedule()).append(',');
+            }
+            csv.append(format(aggregate.temptation())).append(',')
                     .append(aggregate.runs()).append(',')
                     .append(format(aggregate.finalMean())).append(',')
                     .append(format(aggregate.finalStandardDeviation())).append(',')

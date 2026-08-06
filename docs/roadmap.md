@@ -11,9 +11,20 @@
 
 ## v0.2 - Scheduling Robustness
 
-- Asynchronous update semantics.
-- Huberman-Glance comparison.
-- Scheduling sensitivity analysis.
+Implemented on the current development line:
+
+- explicit synchronous and random-sequential update semantics;
+- deterministic shuffled sweeps without replacement;
+- separate initialization and scheduling random streams;
+- versioned schema `0.2` and schedule-aware artifacts;
+- a predeclared paired scheduling-sensitivity study;
+- compact results and updated claim boundaries.
+
+Remaining release work:
+
+- self-contained HTML experiment reports;
+- release packaging and validation for scheduling outputs;
+- versioned release notes and archival metadata.
 
 ## v0.3 - Network Reciprocity
 

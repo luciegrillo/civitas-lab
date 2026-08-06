@@ -1,5 +1,6 @@
 package io.github.luciegrillo.civitas.app.experiment;
 
+import io.github.luciegrillo.civitas.app.config.UpdateScheduleType;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,14 +14,17 @@ public final class ResultAggregator {
     }
 
     /**
-     * Groups results in first-observed scenario and temptation order.
+     * Groups results in first-observed scenario, schedule, and temptation order.
      */
     public static List<AggregateSummary> aggregate(List<RunResult> results) {
         LinkedHashMap<Key, List<RunSummary>> groups = new LinkedHashMap<>();
         for (RunResult result : results) {
             RunSummary summary = result.summary();
+            UpdateScheduleType schedule = result.plan().scenario().updateSchedule() == null
+                    ? null
+                    : result.plan().scenario().effectiveUpdateSchedule().type();
             groups.computeIfAbsent(
-                            new Key(summary.scenarioId(), summary.temptation()),
+                            new Key(summary.scenarioId(), schedule, summary.temptation()),
                             ignored -> new ArrayList<>())
                     .add(summary);
         }
@@ -50,6 +54,7 @@ public final class ResultAggregator {
             int count = summaries.size();
             aggregates.add(new AggregateSummary(
                     entry.getKey().scenarioId,
+                    entry.getKey().updateSchedule,
                     entry.getKey().temptation,
                     count,
                     Statistics.mean(finalFractions),
@@ -70,6 +75,7 @@ public final class ResultAggregator {
         return List.copyOf(aggregates);
     }
 
-    private record Key(String scenarioId, double temptation) {
+    private record Key(
+            String scenarioId, UpdateScheduleType updateSchedule, double temptation) {
     }
 }

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "0.2",
+  "experimentId": "scheduling-robustness",
+  "masterSeed": 19920359,
+  "parallelism": 4,
+  "scenarios": [
+    {
+      "id": "synchronous",
+      "seedGroup": "scheduling-robustness",
+      "lattice": {
+        "width": 15,
+        "height": 15,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.9
+      },
+      "selfInteraction": true,
+      "updateSchedule": {
+        "type": "SYNCHRONOUS"
+      },
+      "temptationValues": [
+        1.05,
+        1.15,
+        1.25,
+        1.35,
+        1.45,
+        1.55,
+        1.65,
+        1.75,
+        1.85,
+        1.95
+      ],
+      "replicates": 20,
+      "ticks": 100,
+      "measurementStart": 50,
+      "snapshotTicks": []
+    },
+    {
+      "id": "random-sequential",
+      "seedGroup": "scheduling-robustness",
+      "lattice": {
+        "width": 15,
+        "height": 15,
+        "boundary": "TOROIDAL"
+      },
+      "initialization": {
+        "type": "BERNOULLI",
+        "pCooperator": 0.9
+      },
+      "selfInteraction": true,
+      "updateSchedule": {
+        "type": "RANDOM_SEQUENTIAL"
+      },
+      "temptationValues": [
+        1.05,
+        1.15,
+        1.25,
+        1.35,
+        1.45,
+        1.55,
+        1.65,
+        1.75,
+        1.85,
+        1.95
+      ],
+      "replicates": 20,
+      "ticks": 100,
+      "measurementStart": 50,
+      "snapshotTicks": []
+    }
+  ]
+}
