@@ -2,6 +2,8 @@
 
 ## v0.1 - Spatial Cooperation
 
+Released:
+
 - Dependency-free deterministic simulation core.
 - Synchronous spatial Prisoner's Dilemma.
 - Reproducible CLI experiments and artifact validation.
@@ -11,7 +13,7 @@
 
 ## v0.2 - Scheduling Robustness
 
-Implemented on the current development line:
+Released in `v0.2.0`:
 
 - explicit synchronous and random-sequential update semantics;
 - deterministic shuffled sweeps without replacement;
@@ -19,12 +21,8 @@ Implemented on the current development line:
 - versioned schema `0.2` and schedule-aware artifacts;
 - a predeclared paired scheduling-sensitivity study;
 - compact results and updated claim boundaries;
-- self-contained, checksummed HTML experiment reports.
-
-Remaining release work:
-
-- release packaging and validation for scheduling outputs;
-- versioned release notes and archival metadata.
+- self-contained, checksummed HTML experiment reports;
+- release packaging with all baseline and scheduling outputs.
 
 ## v0.3 - Network Reciprocity
 

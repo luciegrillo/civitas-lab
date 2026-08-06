@@ -4,7 +4,7 @@ package io.github.luciegrillo.civitas.app;
  * Application version resolved from the packaged manifest.
  */
 public final class VersionInfo {
-    private static final String FALLBACK_VERSION = "0.1.1";
+    private static final String FALLBACK_VERSION = "0.2.0";
 
     private VersionInfo() {
     }
