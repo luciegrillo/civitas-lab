@@ -1,8 +1,7 @@
 package io.github.luciegrillo.civitas.app.experiment;
 
-import io.github.luciegrillo.civitas.app.artifact.ChartRenderer;
 import io.github.luciegrillo.civitas.app.artifact.ChecksumManifest;
-import io.github.luciegrillo.civitas.app.artifact.CsvArtifacts;
+import io.github.luciegrillo.civitas.app.artifact.ExperimentArtifactWriter;
 import io.github.luciegrillo.civitas.app.artifact.JsonArtifacts;
 import io.github.luciegrillo.civitas.app.artifact.OutputWorkspace;
 import io.github.luciegrillo.civitas.app.artifact.Provenance;
@@ -47,12 +46,8 @@ public final class ExperimentRunner {
 
             List<RunResult> immutableResults = List.copyOf(results);
             List<AggregateSummary> aggregates = ResultAggregator.aggregate(immutableResults);
-            CsvArtifacts.writeRunSummaries(
-                    workspace.root().resolve("summary.csv"), immutableResults);
-            CsvArtifacts.writeAggregates(
-                    workspace.root().resolve("aggregate.csv"), aggregates);
-            ChartRenderer.writeAll(
-                    workspace.root().resolve("figures"), immutableResults, aggregates);
+            new ExperimentArtifactWriter(workspace)
+                    .write(experiment, immutableResults, aggregates);
             ChecksumManifest.write(workspace.root());
 
             Path publishedOutput = workspace.publish();

@@ -18,11 +18,11 @@ Implemented on the current development line:
 - separate initialization and scheduling random streams;
 - versioned schema `0.2` and schedule-aware artifacts;
 - a predeclared paired scheduling-sensitivity study;
-- compact results and updated claim boundaries.
+- compact results and updated claim boundaries;
+- self-contained, checksummed HTML experiment reports.
 
 Remaining release work:
 
-- self-contained HTML experiment reports;
 - release packaging and validation for scheduling outputs;
 - versioned release notes and archival metadata.
 

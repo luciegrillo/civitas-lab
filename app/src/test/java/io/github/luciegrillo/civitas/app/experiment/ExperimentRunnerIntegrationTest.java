@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.luciegrillo.civitas.app.artifact.ChecksumManifest;
+import io.github.luciegrillo.civitas.app.artifact.HtmlReportWriter;
 import io.github.luciegrillo.civitas.app.config.ExperimentSpec;
 import io.github.luciegrillo.civitas.app.config.InitializationSpec;
 import io.github.luciegrillo.civitas.app.config.InitializationType;
@@ -38,6 +39,7 @@ class ExperimentRunnerIntegrationTest {
         assertTrue(Files.isRegularFile(output.resolve("provenance.json")));
         assertTrue(Files.isRegularFile(output.resolve("summary.csv")));
         assertTrue(Files.isRegularFile(output.resolve("aggregate.csv")));
+        assertTrue(Files.isRegularFile(output.resolve(HtmlReportWriter.FILE_NAME)));
         assertTrue(Files.isRegularFile(output.resolve("checksums.sha256")));
         assertEquals(0, ChecksumManifest.validate(output).size());
         assertEquals(
@@ -52,6 +54,17 @@ class ExperimentRunnerIntegrationTest {
                         + "initialization_seed,schedule_seed,"));
         assertTrue(Files.readString(output.resolve("aggregate.csv"))
                 .startsWith("scenario_id,update_schedule,temptation,runs,"));
+
+        String html = Files.readString(output.resolve(HtmlReportWriter.FILE_NAME));
+        assertTrue(html.startsWith("<!doctype html>"));
+        assertTrue(html.contains("integration-test"));
+        assertTrue(html.contains("data:image/png;base64,"));
+        assertTrue(html.contains("resolved-experiment.json"));
+        assertFalse(html.contains("<script"));
+        assertFalse(html.contains("https://"));
+        assertFalse(html.contains("http://"));
+        assertTrue(Files.readString(output.resolve(ChecksumManifest.FILE_NAME))
+                .contains("  report.html"));
         assertFalse(hasWorkspaceSibling(".artifacts.staging-"));
         assertFalse(hasWorkspaceSibling(".artifacts.backup-"));
     }
@@ -70,6 +83,7 @@ class ExperimentRunnerIntegrationTest {
                 .contains("update_schedule"));
         assertFalse(Files.readString(output.resolve("aggregate.csv"))
                 .contains("update_schedule"));
+        assertFalse(Files.exists(output.resolve(HtmlReportWriter.FILE_NAME)));
         assertEquals(0, ChecksumManifest.validate(output).size());
     }
 
@@ -87,6 +101,22 @@ class ExperimentRunnerIntegrationTest {
         assertTrue(metadata.contains("\"type\" : \"RANDOM_SEQUENTIAL\""));
         assertTrue(Files.isRegularFile(output.resolve(
                 "runs/random-sequential__b-1_85__r-000/timeseries.csv")));
+        assertTrue(Files.readString(output.resolve(HtmlReportWriter.FILE_NAME))
+                .contains("RANDOM_SEQUENTIAL"));
+    }
+
+    @Test
+    void identicalConfigurationProducesIdenticalReports() throws IOException {
+        Path first = temporaryDirectory.resolve("first-report");
+        Path second = temporaryDirectory.resolve("second-report");
+        ExperimentSpec specification = experiment(2);
+
+        new ExperimentRunner().run(specification, first, false);
+        new ExperimentRunner().run(specification, second, false);
+
+        assertArrayEquals(
+                Files.readAllBytes(first.resolve(HtmlReportWriter.FILE_NAME)),
+                Files.readAllBytes(second.resolve(HtmlReportWriter.FILE_NAME)));
     }
 
     @Test
