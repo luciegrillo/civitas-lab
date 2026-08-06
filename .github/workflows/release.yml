@@ -1,6 +1,16 @@
 name: Release
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/release.yml"
+      - "build.gradle.kts"
+      - "app/src/main/java/io/github/luciegrillo/civitas/app/VersionInfo.java"
+      - "CITATION.cff"
+      - "CHANGELOG.md"
+      - "configs/**"
+      - "docs/releases/**"
   push:
     tags:
       - "v*"
@@ -16,7 +26,7 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     permissions:
       contents: write
 
@@ -58,6 +68,19 @@ jobs:
             exit 1
           fi
 
+          if ! grep -Fqx "version: \"$version\"" CITATION.cff; then
+            printf 'CITATION.cff does not declare version %s\n' "$version" >&2
+            exit 1
+          fi
+          if ! grep -Fq "## [$version] - " CHANGELOG.md; then
+            printf 'CHANGELOG.md does not contain release %s\n' "$version" >&2
+            exit 1
+          fi
+          if [[ ! -f "docs/releases/v${version}.md" ]]; then
+            printf 'Missing release notes: docs/releases/v%s.md\n' "$version" >&2
+            exit 1
+          fi
+
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
             expected="${GITHUB_REF_NAME#v}"
             if [[ "$GITHUB_REF_NAME" != v* || "$version" != "$expected" ]]; then
@@ -84,12 +107,22 @@ jobs:
             --output artifacts/kaleidoscope
           java -jar "$CIVITAS_JAR" validate artifacts/kaleidoscope
 
-      - name: Run robustness experiment
+      - name: Run implementation robustness experiment
         run: |
           java -jar "$CIVITAS_JAR" run \
             configs/robustness-v0.1.json \
             --output artifacts/robustness
           java -jar "$CIVITAS_JAR" validate artifacts/robustness
+
+      - name: Run scheduling robustness experiment
+        run: |
+          java -jar "$CIVITAS_JAR" run \
+            configs/scheduling-robustness.json \
+            --output artifacts/scheduling-robustness
+          java -jar "$CIVITAS_JAR" validate artifacts/scheduling-robustness
+          test -s artifacts/scheduling-robustness/report.html
+          grep -Fq "  report.html" \
+            artifacts/scheduling-robustness/checksums.sha256
 
       - name: Package release artifacts
         shell: bash
@@ -97,7 +130,8 @@ jobs:
           mkdir -p dist
           cp "$CIVITAS_JAR" "dist/civitas-lab-${CIVITAS_VERSION}.jar"
           tar --sort=name --mtime="@0" --owner=0 --group=0 --numeric-owner \
-            -cf - -C artifacts frequency kaleidoscope robustness \
+            -cf - -C artifacts \
+            frequency kaleidoscope robustness scheduling-robustness \
             | gzip -n > "dist/civitas-lab-${CIVITAS_VERSION}-results.tar.gz"
           (
             cd dist
@@ -124,10 +158,6 @@ jobs:
         shell: bash
         run: |
           notes="docs/releases/v${CIVITAS_VERSION}.md"
-          if [[ ! -f "$notes" ]]; then
-            echo "Missing release notes: $notes" >&2
-            exit 1
-          fi
           gh release create "$GITHUB_REF_NAME" \
             "dist/civitas-lab-${CIVITAS_VERSION}.jar#Executable JAR (Java 25)" \
             "dist/civitas-lab-${CIVITAS_VERSION}-results.tar.gz#Complete experiment outputs" \
