@@ -106,6 +106,20 @@ class ExperimentRunnerIntegrationTest {
     }
 
     @Test
+    void identicalConfigurationProducesIdenticalReports() throws IOException {
+        Path first = temporaryDirectory.resolve("first-report");
+        Path second = temporaryDirectory.resolve("second-report");
+        ExperimentSpec specification = experiment(2);
+
+        new ExperimentRunner().run(specification, first, false);
+        new ExperimentRunner().run(specification, second, false);
+
+        assertArrayEquals(
+                Files.readAllBytes(first.resolve(HtmlReportWriter.FILE_NAME)),
+                Files.readAllBytes(second.resolve(HtmlReportWriter.FILE_NAME)));
+    }
+
+    @Test
     void rejectsExistingOutputUnlessOverwriteIsExplicit() throws IOException {
         Path output = temporaryDirectory.resolve("artifacts");
         ExperimentRunner runner = new ExperimentRunner();
@@ -135,9 +149,6 @@ class ExperimentRunnerIntegrationTest {
         assertArrayEquals(
                 Files.readAllBytes(serial.resolve("aggregate.csv")),
                 Files.readAllBytes(parallel.resolve("aggregate.csv")));
-        assertArrayEquals(
-                Files.readAllBytes(serial.resolve(HtmlReportWriter.FILE_NAME)),
-                Files.readAllBytes(parallel.resolve(HtmlReportWriter.FILE_NAME)));
 
         try (var paths = Files.walk(serial.resolve("runs"))) {
             for (Path first : paths.filter(Files::isRegularFile).toList()) {

@@ -30,14 +30,19 @@ stable configuration data. It intentionally excludes the timestamp, operating
 system, Java vendor, and source revision stored in `provenance.json`.
 
 The report is written before `checksums.sha256`, so its digest is included in
-the manifest. Repeating an experiment with the same code, configuration, and
-seeds on the same supported rendering environment must produce the same report
-bytes regardless of experiment-level parallelism.
+the manifest. Repeating an experiment with the same complete configuration,
+code, seeds, and supported rendering environment produces the same report
+bytes.
 
-PNG rendering may still vary across font or graphics implementations. Because
-figures are embedded, a platform-specific PNG difference also changes the
-report digest. Numeric CSV artifacts remain the primary cross-platform
-scientific comparison surface.
+The resolved configuration is displayed in the report. Changing an execution
+property such as `parallelism` therefore changes the report even though the
+run-level and aggregate scientific CSV artifacts remain invariant to
+experiment-level scheduling.
+
+PNG rendering may vary across font or graphics implementations. Because figures
+are embedded, a platform-specific PNG difference also changes the report
+digest. Numeric CSV artifacts remain the primary cross-platform scientific
+comparison surface.
 
 ## Compatibility
 
