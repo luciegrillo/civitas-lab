@@ -11,8 +11,8 @@ simulation runs, aggregate statistics, figures, snapshots, provenance, and a
 SHA-256 manifest that can be validated independently. The published v0.1
 baseline reproduces documented synchronous spatial Prisoner's Dilemma regimes
 and includes a predeclared 1,200-run implementation-robustness study. The v0.2
-development line adds explicit random-sequential scheduling and a paired
-400-run scheduling-sensitivity study.
+development line adds explicit random-sequential scheduling, a paired 400-run
+scheduling-sensitivity study, and a standalone HTML experiment report.
 
 ## Published Baseline
 
@@ -49,6 +49,19 @@ synchronous runs remain mixed.
 
 See the predeclared [scheduling protocol](docs/scheduling-study-protocol.md) and
 [scheduling results](docs/scheduling-results.md).
+
+### Self-contained experiment report
+
+Schema `0.2` executions generate `report.html` beside the machine-readable
+artifacts. The report contains the scenario design, selected distribution
+statistics, the resolved configuration, reproduction commands, and all
+experiment-level PNG figures embedded directly in the file.
+
+It uses inline CSS only: no server, JavaScript, remote fonts, analytics, or
+frontend build. The report is included in `checksums.sha256`; volatile runtime
+metadata remains separate in `provenance.json`.
+
+See the [HTML report contract](docs/report-contract.md).
 
 ### v0.1 implementation robustness
 
@@ -99,7 +112,7 @@ model choices affect simulation behavior.
 | Bounded and toroidal square lattices | Other documented update mechanisms |
 | Deterministic unconditional imitation | Reputation and assessment rules |
 | Separate initialization and scheduling seeds | Public-goods and institutional models |
-| Reproducible experiment and artifact pipeline | Polarization and information diffusion |
+| Reproducible artifacts and standalone HTML reports | Polarization and information diffusion |
 
 The current results support claims about the documented implementation and its
 behavior under the tested configurations. They do not establish that spatial
@@ -127,7 +140,7 @@ claiming to model real societies.
 - **Scientifically modest:** claims are limited to the implemented model and
   its documented assumptions.
 - **Engineering-focused:** the mathematical core is isolated from CLI, storage,
-  and visualization concerns.
+  reporting, and visualization concerns.
 - **Incremental:** new mechanisms are added only after the existing baseline is
   specified and verified.
 
@@ -145,8 +158,19 @@ java -jar app/build/libs/civitas-lab-0.1.1.jar \
   validate artifacts/smoke
 ```
 
-A scheduling smoke comparison is available at
-[`configs/scheduling-smoke.json`](configs/scheduling-smoke.json).
+The v0.2 scheduling comparison can be exercised with:
+
+```bash
+java -jar app/build/libs/civitas-lab-0.1.1.jar \
+  run configs/scheduling-smoke.json \
+  --output artifacts/scheduling-smoke
+java -jar app/build/libs/civitas-lab-0.1.1.jar \
+  validate artifacts/scheduling-smoke
+```
+
+Open `artifacts/scheduling-smoke/report.html` directly in a browser. The report
+is self-contained; the sibling CSV and JSON files remain the full-precision
+scientific record.
 
 Each execution writes the resolved configuration, provenance, run-level time
 series and snapshots, aggregate tables, charts, and a SHA-256 manifest.
@@ -157,9 +181,9 @@ contract.
 ## Roadmap
 
 The v0.2 development milestone now includes the scheduling engine, versioned
-configuration, paired study, and compact results. Remaining release work
-focuses on self-contained HTML reports, release validation, and archival
-metadata before moving to graph topologies.
+configuration, paired study, compact results, and self-contained HTML reports.
+Remaining release work focuses on release validation, packaging, release notes,
+and archival metadata before moving to graph topologies.
 
 See the full [roadmap](docs/roadmap.md) for direction and release boundaries.
 
@@ -171,6 +195,8 @@ See the full [roadmap](docs/roadmap.md) for direction and release boundaries.
 - [Experiment protocol](docs/experiment-protocol.md)
 - [Scheduling robustness protocol](docs/scheduling-study-protocol.md)
 - [Architecture](docs/architecture.md)
+- [Experiment format](docs/experiment-format.md)
+- [HTML report contract](docs/report-contract.md)
 - [Baseline results](docs/results.md)
 - [Implementation robustness study](docs/robustness.md)
 - [Scheduling robustness results](docs/scheduling-results.md)

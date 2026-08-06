@@ -138,8 +138,11 @@ The same document is available at
 
 ## Output Contract
 
+Schema `0.2` writes:
+
 ```text
 output/
+├── report.html
 ├── resolved-experiment.json
 ├── provenance.json
 ├── summary.csv
@@ -153,8 +156,16 @@ output/
         └── snapshots/
 ```
 
+`report.html` is a standalone, no-JavaScript presentation artifact with inline
+CSS, embedded experiment-level PNG figures, the resolved configuration, and key
+aggregate statistics. See the [HTML Report Contract](report-contract.md).
+
 `aggregate.csv` reports means, across-replicate standard deviations, quantiles,
-and final-state rates for each scenario and temptation value.
+and final-state rates for each scenario, schedule, and temptation value.
 
 `provenance.json` contains volatile runtime metadata and is intentionally
-excluded from `checksums.sha256`. All scientific artifacts are hashed.
+excluded from `checksums.sha256`. All deterministic scientific artifacts,
+including `report.html`, are hashed.
+
+Schema `0.1` retains its original output set and does not generate
+`report.html`, preserving the published artifact contract.
