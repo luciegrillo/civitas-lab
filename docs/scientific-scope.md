@@ -7,7 +7,7 @@ laboratory for implementing transparent, reproducible agent-based models.
 
 Version 0.1 reproduces a canonical synchronous spatial Prisoner's Dilemma
 associated with Nowak and May and documents how selected implementation choices
-affect its behavior. The v0.2 development line adds one precisely specified
+affect its behavior. Version 0.2 adds one precisely specified
 random-sequential schedule and measures sensitivity to update timing without
 changing the verified synchronous baseline.
 
@@ -66,6 +66,6 @@ configuration and resulting provenance.
 
 Version 0.1 performs model-to-paper validation: it checks whether the
 implementation reproduces qualitative and analytically described behavior of
-the published synchronous model. The scheduling extension performs
-model-to-model sensitivity analysis between two declared update mechanisms.
-Neither is model-to-world validation.
+the published synchronous model. Version 0.2 performs model-to-model
+sensitivity analysis between two declared update mechanisms. Neither is
+model-to-world validation.

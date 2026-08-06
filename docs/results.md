@@ -50,21 +50,21 @@ is not presented as a hash of a published historical lattice.
 ## Reproduction
 
 ```bash
-java -jar app/build/libs/civitas-lab-0.1.1.jar \
+java -jar app/build/libs/civitas-lab-0.2.0.jar \
   run configs/nowak-may-frequency.json \
   --output artifacts/frequency
 
-java -jar app/build/libs/civitas-lab-0.1.1.jar \
+java -jar app/build/libs/civitas-lab-0.2.0.jar \
   run configs/nowak-may-kaleidoscope.json \
   --output artifacts/kaleidoscope
 ```
 
-## Scheduling Robustness Follow-up
+## v0.2 Scheduling Robustness
 
-The development line adds a separately specified random-sequential engine and a
-paired comparison against the synchronous baseline. Under the predeclared
-400-run grid, final cooperation is lower under random-sequential updating at
-all tested temptation values, with the largest differences at high temptation.
+Version 0.2 adds a separately specified random-sequential engine and a paired
+comparison against the synchronous baseline. Under the predeclared 400-run
+grid, final cooperation is lower under random-sequential updating at all tested
+temptation values, with the largest differences at high temptation.
 
 See [Scheduling Robustness Results](scheduling-results.md) for the complete
 protocol, compact tables, interpretation, and reproduction command.

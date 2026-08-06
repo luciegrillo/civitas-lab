@@ -7,38 +7,39 @@ Reproducible experimental software for spatial evolutionary games, built in
 modern Java.
 
 Civitas Lab turns a versioned experiment configuration into deterministic
-simulation runs, aggregate statistics, figures, snapshots, provenance, and a
-SHA-256 manifest that can be validated independently. The published v0.1
-baseline reproduces documented synchronous spatial Prisoner's Dilemma regimes
-and includes a predeclared 1,200-run implementation-robustness study. The v0.2
-development line adds explicit random-sequential scheduling, a paired 400-run
-scheduling-sensitivity study, and a standalone HTML experiment report.
+simulation runs, aggregate statistics, figures, snapshots, provenance, a
+standalone HTML report, and a SHA-256 manifest that can be validated
+independently. Version 0.2.0 preserves the verified synchronous baseline and
+adds explicit random-sequential scheduling, a paired 400-run
+scheduling-sensitivity study, separate random streams, and transactional
+artifact publication.
 
-## Published Baseline
+## Current Release
 
-Civitas Lab `v0.1.1` provides:
+Civitas Lab `v0.2.0` provides:
 
-- a dependency-free deterministic lattice engine;
-- synchronous double-buffered updates with explicit tie semantics;
+- dependency-free synchronous and random-sequential lattice engines;
+- explicit update semantics with deterministic tie handling;
 - bounded and toroidal Moore neighborhoods with optional self-interaction;
-- stable seed derivation and paired initial conditions;
-- strict, versioned JSON experiment configurations;
-- parallel execution with deterministic output ordering;
-- CSV, JSON, PNG, aggregate charts, provenance, and SHA-256 manifests;
+- stable, separately derived initialization and scheduling seeds;
+- strict experiment schemas `0.1` and `0.2`;
+- parallel execution with deterministic scientific output ordering;
+- CSV, JSON, PNG, standalone HTML, provenance, and SHA-256 manifests;
 - historical frequency-profile and kaleidoscope scenarios;
-- a 1,200-run robustness study over model implementation choices.
+- a 1,200-run implementation-robustness study;
+- a paired 400-run update-scheduling study.
 
-Download the executable and complete experiment outputs from the
-[v0.1.1 release](https://github.com/luciegrillo/civitas-lab/releases/tag/v0.1.1).
+Download the executable and complete validated experiment outputs from the
+[v0.2.0 release](https://github.com/luciegrillo/civitas-lab/releases/tag/v0.2.0).
 
 ## Experiment Showcase
 
 ### Update-schedule sensitivity
 
-The v0.2 development study compares synchronous generations with
-random-sequential shuffled sweeps while pairing the initial lattice across both
-conditions. It executes 400 runs over ten temptation values and reports
-schedule-aware distributions rather than only means.
+The v0.2 study compares synchronous generations with random-sequential shuffled
+sweeps while pairing the initial lattice across both conditions. It executes
+400 runs over ten temptation values and reports schedule-aware distributions
+rather than only means.
 
 ![Median final cooperation by update schedule](docs/results/v0.2/scheduling-scenario-comparison.svg)
 
@@ -63,7 +64,7 @@ metadata remains separate in `provenance.json`.
 
 See the [HTML report contract](docs/report-contract.md).
 
-### v0.1 implementation robustness
+### Implementation robustness
 
 The v0.1 robustness suite executes 1,200 runs across temptation, boundaries,
 self-interaction, lattice sizes, and initial cooperator densities. It reports
@@ -106,7 +107,7 @@ Civitas Lab is a focused laboratory for one documented family of binary spatial
 evolutionary games. It verifies implementation rules and studies how selected
 model choices affect simulation behavior.
 
-| Implemented on the current development line | Planned, not yet implemented |
+| Implemented in v0.2.0 | Planned, not yet implemented |
 |---|---|
 | Synchronous and random-sequential spatial Prisoner's Dilemma | General graph topologies |
 | Bounded and toroidal square lattices | Other documented update mechanisms |
@@ -126,10 +127,10 @@ implementation choices that generated them. Civitas Lab makes those choices
 explicit and testable: configurations, seeds, update semantics, runtime
 metadata, and output checksums travel with each experiment.
 
-The first release is deliberately narrow. It uses a published spatial game as
-a validation target, exposes sensitivity to model choices, and establishes a
-reproducible foundation for later scheduling and network experiments without
-claiming to model real societies.
+The project develops one mechanism at a time. Published models provide
+validation targets, sensitivity studies expose implementation dependence, and
+artifact contracts preserve exact inputs and outputs without claiming to model
+real societies.
 
 ## Project Principles
 
@@ -151,20 +152,20 @@ tool automatically.
 
 ```bash
 ./gradlew build
-java -jar app/build/libs/civitas-lab-0.1.1.jar \
+java -jar app/build/libs/civitas-lab-0.2.0.jar \
   run configs/smoke.json \
   --output artifacts/smoke
-java -jar app/build/libs/civitas-lab-0.1.1.jar \
+java -jar app/build/libs/civitas-lab-0.2.0.jar \
   validate artifacts/smoke
 ```
 
-The v0.2 scheduling comparison can be exercised with:
+Run a paired scheduling comparison with:
 
 ```bash
-java -jar app/build/libs/civitas-lab-0.1.1.jar \
+java -jar app/build/libs/civitas-lab-0.2.0.jar \
   run configs/scheduling-smoke.json \
   --output artifacts/scheduling-smoke
-java -jar app/build/libs/civitas-lab-0.1.1.jar \
+java -jar app/build/libs/civitas-lab-0.2.0.jar \
   validate artifacts/scheduling-smoke
 ```
 
@@ -180,10 +181,9 @@ contract.
 
 ## Roadmap
 
-The v0.2 development milestone now includes the scheduling engine, versioned
-configuration, paired study, compact results, and self-contained HTML reports.
-Remaining release work focuses on release validation, packaging, release notes,
-and archival metadata before moving to graph topologies.
+Version 0.2.0 completes the scheduling-robustness milestone. The next bounded
+research milestone generalizes the interaction structure to explicit graph
+topologies while retaining the same reproducibility and claim-boundary rules.
 
 See the full [roadmap](docs/roadmap.md) for direction and release boundaries.
 
