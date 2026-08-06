@@ -1,22 +1,23 @@
 # ODD Model Description
 
-This document describes the Civitas Lab v0.1 spatial Prisoner's Dilemma using
-the Overview, Design concepts, and Details (ODD) protocol.
+This document describes the Civitas Lab spatial Prisoner's Dilemma using the
+Overview, Design concepts, and Details (ODD) protocol. It covers the verified
+v0.1 synchronous baseline and the v0.2 random-sequential scheduling extension.
 
 ## Overview
 
 ### Purpose and Patterns
 
-The model reproduces a canonical deterministic spatial evolutionary game
-associated with Nowak and May. Its purpose is to verify the simulation engine
-against documented local rules and study how cooperation-like spatial patterns
-depend on temptation, self-interaction, boundaries, lattice size, and initial
-conditions.
+The model reproduces a canonical spatial evolutionary game associated with
+Nowak and May. Its purpose is to verify the simulation engine against
+documented local rules and study how cooperation-like spatial patterns depend
+on temptation, self-interaction, boundaries, lattice size, initial conditions,
+and update scheduling.
 
 The target patterns are coexistence of cooperators and defectors, oscillating
-strategy frequencies, invasion fronts, and reflection-symmetric
-"kaleidoscopic" transients. These are model-level patterns, not empirical
-targets for a real society.
+strategy frequencies, invasion fronts, reflection-symmetric "kaleidoscopic"
+transients, and sensitivity to scheduling. These are model-level patterns, not
+empirical targets for a real society.
 
 ### Entities, State Variables, and Scales
 
@@ -29,20 +30,35 @@ contains one pure strategy:
 Sites have no identity, memory, age, location change, or private information.
 Location is fixed by the row-major lattice coordinate.
 
-Time is discrete. Generation zero is the initialized lattice, and one tick
-advances the entire population by one synchronous generation.
+Time is discrete. Generation zero is the initialized lattice. One public tick
+represents one complete population-scale update: either one synchronous
+generation or one random-sequential shuffled sweep containing exactly one visit
+to every site.
 
 ### Process Overview and Scheduling
 
-Each generation has two complete phases:
+The schedule is part of the model specification.
 
-1. Every site accumulates payoff from its current interaction partners.
-2. Every site selects its next strategy from current-generation local
-   candidates.
+Under `SYNCHRONOUS` updating:
 
-All next strategies are written to a separate buffer. The buffers are swapped
-only after every decision is complete, so iteration order cannot affect the
-model state.
+1. Every site accumulates payoff from generation `t`.
+2. Every site selects its next strategy from candidates evaluated in that same
+   state.
+3. Selected strategies are written to a separate buffer.
+4. Buffers are swapped only after every decision is complete.
+
+Iteration order cannot affect a synchronous transition.
+
+Under `RANDOM_SEQUENTIAL` updating:
+
+1. All row-major site indices are shuffled without replacement.
+2. Sites are visited once in that order.
+3. Immediately before each decision, focal and candidate payoffs are computed
+   from the current in-place lattice.
+4. The selected strategy is written immediately.
+
+Later sites in a sweep can therefore observe changes made earlier in the same
+tick.
 
 ## Design Concepts
 
@@ -50,7 +66,9 @@ model state.
 
 The model implements unconditional imitation in a weak Prisoner's Dilemma on a
 regular spatial lattice. Spatial locality allows strategies to form persistent
-domains even though every site follows the same deterministic rule.
+domains even though every site follows the same rule. Scheduling determines
+whether decisions share one frozen generation state or observe earlier changes
+within a shuffled sweep.
 
 ### Emergence
 
@@ -67,7 +85,8 @@ forecast future generations, or reason about other sites.
 ### Learning, Prediction, and Sensing
 
 There is no learning, memory, or prediction. A site effectively senses only the
-current strategies and resulting payoffs in its local neighborhood.
+strategies and resulting payoffs in its local neighborhood at the instant its
+update rule is evaluated.
 
 ### Interaction
 
@@ -81,13 +100,14 @@ site is always an imitation candidate, regardless of this setting.
 
 ### Stochasticity
 
-The transition engine is deterministic. Stochasticity enters only through
-Bernoulli initialization. Civitas Lab owns a stable SplitMix64 implementation
-so a seed identifies the same initial lattice independently of JDK random
-providers.
+Bernoulli initialization uses Civitas Lab's owned SplitMix64 implementation so
+an initialization seed identifies the same lattice independently of JDK random
+providers. Central-defector initialization is deterministic.
 
-The central-defector initialization is fully deterministic and does not consume
-random numbers.
+The synchronous transition engine consumes no randomness. Random-sequential
+updating uses a separately derived schedule seed and a stable Fisher-Yates
+shuffle. The same configuration and seeds produce bit-identical trajectories.
+Changing only the schedule seed cannot change generation zero.
 
 ### Collectives
 
@@ -104,16 +124,23 @@ The engine observes:
 - lattice snapshots at requested ticks.
 
 The experiment layer derives run-level means, final-state distributions,
-quantiles, and rates of all-cooperate, all-defect, and mixed outcomes.
+quantiles, and rates of all-cooperate, all-defect, and mixed outcomes. Schema
+`0.2` outputs additionally identify the update schedule and record both random
+streams.
 
 ## Details
 
 ### Initialization
 
 `BERNOULLI` independently assigns `C` with configured probability
-`pCooperator`. A run seed is derived from the experiment master seed, seed
-group, and replicate index. Temptation is intentionally absent from seed
-derivation, enabling paired parameter comparisons.
+`pCooperator`. An initialization seed is derived from the experiment master
+seed, seed group, and replicate index. Temptation and schedule are intentionally
+absent from this derivation, enabling paired comparisons.
+
+Schema `0.2` separately derives a schedule seed in the `schedule` domain. Paired
+synchronous and random-sequential scenarios with the same seed group and
+replicate index receive the same initial lattice and schedule-seed identity,
+although the synchronous engine does not consume the latter.
 
 `CENTRAL_DEFECTOR` requires odd lattice dimensions and places one `D` at the
 unique center of an otherwise cooperative lattice.
@@ -121,7 +148,8 @@ unique center of an otherwise cooperative lattice.
 ### Input Data
 
 The model uses no external empirical input data. All parameters are declared in
-a strict, versioned JSON experiment document.
+a strict, versioned JSON experiment document. Schema `0.1` retains implicit
+synchronous semantics; schema `0.2` requires an explicit update schedule.
 
 ### Payoff Submodel
 
@@ -136,6 +164,11 @@ The temptation parameter is finite and restricted to `1 < b ≤ 2`. Payoffs are
 raw accumulated totals; they are not normalized by the number of active
 neighbors.
 
+For synchronous updates, every site's payoff is computed once from generation
+`t`. For random-sequential updates, a candidate's payoff is recomputed when it
+is considered for the current focal decision, using the current in-place
+lattice.
+
 ### Strategy-Update Submodel
 
 For each focal site, the engine finds the largest cooperator payoff and largest
@@ -147,7 +180,8 @@ defector payoff among the focal site and all present Moore neighbors.
 
 This deterministic cross-strategy tie policy is an explicit Civitas Lab
 decision because accessible historical descriptions do not fully specify tie
-resolution. It avoids directional bias and preserves symmetry.
+resolution. It avoids directional bias and preserves symmetry under the
+synchronous baseline.
 
 ### Boundary Submodel
 
@@ -159,3 +193,7 @@ remain raw totals.
 
 The model target and methodological protocol are documented in
 [References](references.md) and [`references.bib`](../references.bib).
+Scheduling semantics, the predeclared study, and its results are documented in
+[Update Schedules](update-schedules.md),
+[Scheduling Robustness Protocol](scheduling-study-protocol.md), and
+[Scheduling Robustness Results](scheduling-results.md).

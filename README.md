@@ -10,7 +10,9 @@ Civitas Lab turns a versioned experiment configuration into deterministic
 simulation runs, aggregate statistics, figures, snapshots, provenance, and a
 SHA-256 manifest that can be validated independently. The published v0.1
 baseline reproduces documented synchronous spatial Prisoner's Dilemma regimes
-and includes a predeclared 1,200-run robustness study.
+and includes a predeclared 1,200-run implementation-robustness study. The v0.2
+development line adds explicit random-sequential scheduling and a paired
+400-run scheduling-sensitivity study.
 
 ## Published Baseline
 
@@ -31,9 +33,26 @@ Download the executable and complete experiment outputs from the
 
 ## Experiment Showcase
 
-### Scheduling-sensitive cooperation baseline
+### Update-schedule sensitivity
 
-The robustness suite executes 1,200 runs across temptation, boundaries,
+The v0.2 development study compares synchronous generations with
+random-sequential shuffled sweeps while pairing the initial lattice across both
+conditions. It executes 400 runs over ten temptation values and reports
+schedule-aware distributions rather than only means.
+
+![Median final cooperation by update schedule](docs/results/v0.2/scheduling-scenario-comparison.svg)
+
+Within this bounded grid, random-sequential updating produces a lower median
+final cooperator fraction at every tested temptation value. At `b=1.85` and
+`b=1.95`, all random-sequential runs reach all-defect by tick 100, while 85% of
+synchronous runs remain mixed.
+
+See the predeclared [scheduling protocol](docs/scheduling-study-protocol.md) and
+[scheduling results](docs/scheduling-results.md).
+
+### v0.1 implementation robustness
+
+The v0.1 robustness suite executes 1,200 runs across temptation, boundaries,
 self-interaction, lattice sizes, and initial cooperator densities. It reports
 means together with dispersion, quantiles, and absorbing-state rates so that
 multimodal outcomes are not hidden behind one summary statistic.
@@ -64,27 +83,28 @@ how the same starting condition produces different cooperation trajectories.
 
 The complete configurations, compact tables, interpretation boundaries, and
 reproduction commands are documented in the
-[baseline results](docs/results.md) and
-[robustness study](docs/robustness.md).
+[baseline results](docs/results.md),
+[implementation robustness study](docs/robustness.md), and
+[scheduling results](docs/scheduling-results.md).
 
 ## Scientific Scope
 
-Civitas Lab is currently a focused laboratory for one documented family of
-binary spatial evolutionary games. It verifies implementation rules and studies
-how selected model choices affect the resulting simulation behavior.
+Civitas Lab is a focused laboratory for one documented family of binary spatial
+evolutionary games. It verifies implementation rules and studies how selected
+model choices affect simulation behavior.
 
-| Implemented in v0.1 | Planned, not yet implemented |
+| Implemented on the current development line | Planned, not yet implemented |
 |---|---|
-| Synchronous spatial Prisoner's Dilemma | Asynchronous update schedules |
-| Bounded and toroidal square lattices | General graph topologies |
-| Deterministic unconditional imitation | Other documented update mechanisms |
-| Binary payoff and update-rule extension points | Reputation and assessment rules |
-| Reproducible experiment and artifact pipeline | Public-goods and institutional models |
+| Synchronous and random-sequential spatial Prisoner's Dilemma | General graph topologies |
+| Bounded and toroidal square lattices | Other documented update mechanisms |
+| Deterministic unconditional imitation | Reputation and assessment rules |
+| Separate initialization and scheduling seeds | Public-goods and institutional models |
+| Reproducible experiment and artifact pipeline | Polarization and information diffusion |
 
 The current results support claims about the documented implementation and its
 behavior under the tested configurations. They do not establish that spatial
-structure universally promotes cooperation, predict human societies, or replace
-mature agent-based modeling platforms.
+structure universally promotes cooperation, that random-sequential updating
+always reduces cooperation, or that the model predicts human societies.
 
 ## Why This Project Exists
 
@@ -102,8 +122,8 @@ claiming to model real societies.
 
 - **Reproducible:** configurations, seeds, provenance, and checksums accompany
   experiment outputs.
-- **Deterministic where specified:** synchronous model updates do not depend on
-  iteration order or thread scheduling.
+- **Deterministic where specified:** each supported schedule is repeatable from
+  its declared seeds and semantics.
 - **Scientifically modest:** claims are limited to the implemented model and
   its documented assumptions.
 - **Engineering-focused:** the mathematical core is isolated from CLI, storage,
@@ -125,6 +145,9 @@ java -jar app/build/libs/civitas-lab-0.1.1.jar \
   validate artifacts/smoke
 ```
 
+A scheduling smoke comparison is available at
+[`configs/scheduling-smoke.json`](configs/scheduling-smoke.json).
+
 Each execution writes the resolved configuration, provenance, run-level time
 series and snapshots, aggregate tables, charts, and a SHA-256 manifest.
 
@@ -133,11 +156,10 @@ contract.
 
 ## Roadmap
 
-The next scientific milestone is scheduling robustness: defining and comparing
-asynchronous update semantics against the verified synchronous baseline. Later
-work may add graph topologies, reciprocity, reputation, public-goods games, and
-institutional mechanisms only with explicit model specifications and validation
-targets.
+The v0.2 development milestone now includes the scheduling engine, versioned
+configuration, paired study, and compact results. Remaining release work
+focuses on self-contained HTML reports, release validation, and archival
+metadata before moving to graph topologies.
 
 See the full [roadmap](docs/roadmap.md) for direction and release boundaries.
 
@@ -145,10 +167,13 @@ See the full [roadmap](docs/roadmap.md) for direction and release boundaries.
 
 - [Scientific scope](docs/scientific-scope.md)
 - [ODD model description](docs/model-odd.md)
+- [Update schedules](docs/update-schedules.md)
 - [Experiment protocol](docs/experiment-protocol.md)
+- [Scheduling robustness protocol](docs/scheduling-study-protocol.md)
 - [Architecture](docs/architecture.md)
 - [Baseline results](docs/results.md)
-- [Robustness study](docs/robustness.md)
+- [Implementation robustness study](docs/robustness.md)
+- [Scheduling robustness results](docs/scheduling-results.md)
 - [Limitations and claim boundaries](docs/limitations.md)
 - [References](docs/references.md)
 - [Roadmap](docs/roadmap.md)
